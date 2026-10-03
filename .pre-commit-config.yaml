@@ -1,0 +1,17 @@
+repos:
+  # 1. Базовые проверки Git и файлов
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace # Удаляет лишние пробелы на концах строк
+      - id: end-of-file-fixer # Добавляет пустую строку в конец файла
+      - id: check-yaml # Проверяет валидность YAML-файлов
+      - id: check-added-large-files # Защищает от случайного коммита гигантских файлов (>500KB)
+
+  # 2. Быстрый линтер и форматтер Ruff
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.9
+    hooks:
+      - id: ruff
+        args: [--fix] # Автоматически исправляет простые ошибки линтера
+      - id: ruff-format
