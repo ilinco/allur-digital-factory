@@ -1,249 +1,194 @@
-# Python FastAPI Todos API
-
-Асинхронный REST API сервис для управления задачами.
-
----
+# Allur Digital Factory
 
 ## 🛠 Стек технологий
 
-- **Язык**: Python 3.12+
-- **Веб-фреймворк**: [FastAPI](https://fastapi.tiangolo.com/) + [Uvicorn](https://www.uvicorn.org/)
-- **База данных**: PostgreSQL
-- **ORM / Слой данных**: [SQLAlchemy 2.0](https://docs.sqlalchemy.org/) (полностью асинхронный режим) + драйвер [asyncpg](https://github.com/MagicStack/asyncpg)
-- **Миграции**: [Alembic](https://alembic.sqlalchemy.org/)
-- **Валидация и схемы**: [Pydantic v2](https://docs.pydantic.dev/) + [pydantic-settings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/)
-- **Менеджер пакетов и окружения**: [uv](https://docs.astral.sh/uv/)
-- **Линтинг и форматирование**: [Ruff](https://docs.astral.sh/ruff/) + [pre-commit](https://pre-commit.com/)
+- **Backend**: Python 3.12, FastAPI, Uvicorn, SQLAlchemy 2.0 (Async), asyncpg, Alembic, Pydantic v2, uv
+- **Frontend**: React 19, TypeScript, Vite, pnpm
+- **База данных**: PostgreSQL (Supabase)
+- **Контейнеризация**: Docker, Docker Compose, Nginx (для prod)
 
 ---
 
-## 🏗 Архитектура и как всё работает
+## 🚀 Быстрый старт через Docker (Рекомендуется)
 
-Проект организован по принципам **слоистой чистой архитектуры (Layered Architecture)** с разделением ответственности:
+Для работы вам понадобятся установленные **Docker** и **Docker Compose**.
 
-```text
-src/python_fastapi/
-├── api/                   # Презентационный слой (HTTP API)
-│   ├── dependencies.py    # Внедрение зависимостей (DI) для сервисов и сессий
-│   └── routers/           # Контроллеры/эндпоинты (health, task)
-├── core/                  # Системное ядро приложения
-│   ├── config.py          # Настройки (читаются из переменных окружения и .env)
-│   ├── database.py        # Асинхронный движок SQLAlchemy и фабрика сессий
-│   ├── exceptions.py      # Кастомные доменные исключения (TaskNotFoundError и т.д.)
-│   └── exception_handlers.py # Централизованная обработка ошибок с понятными HTTP-ответами
-├── models/                # Модели базы данных SQLAlchemy ORM
-│   ├── base.py            # Базовый декларативный класс с автогенерацией UUID
-│   └── task.py            # Модель таблицы tasks
-├── repositories/          # Слой работы с БД (CRUD операции)
-│   └── task.py            # TaskRepository: прямой доступ к данным
-├── schemas/               # Схемы валидации и сериализации Pydantic (DTO)
-│   └── task.py            # Схемы для создания, чтения и обновления задач
-├── services/              # Слой бизнес-логики
-│   └── task.py            # TaskService: координация логики и репозитория
-└── main.py                # Точка входа в приложение и регистрация роутов
-```
+### 1. Подготовка переменных окружения
 
-### Поток обработки запроса (Request Flow)
-1. **Клиент** отправляет HTTP-запрос (например, `POST /tasks/`).
-2. **Роутер (`api/routers/task.py`)** принимает запрос, автоматически валидирует тело через Pydantic-схему `TaskCreateSchema` и запрашивает сервис через механизм зависимостей (`Depends`).
-3. **Зависимости (`api/dependencies.py` & `core/database.py`)** открывают асинхронную сессию БД (`AsyncSession`) и передают её в `TaskService`.
-4. **Сервис (`services/task.py`)** содержит бизнес-правила, вызывает методы репозитория и трансформирует сущности базы данных в Pydantic-схемы для ответа.
-5. **Репозиторий (`repositories/task.py`)** выполняет асинхронные запросы к PostgreSQL через SQLAlchemy.
-6. **Обработчики ошибок (`core/exception_handlers.py`)**: если сущность не найдена, выбрасывается `TaskNotFoundError`, который централизованно превращается в аккуратный JSON со статусом `404 Not Found` (без падения сервера).
-
----
-
-## 🚀 Быстрый запуск
-
-### 1. Предварительные требования
-
-- **Python 3.12** или выше
-- **Менеджер пакетов [uv](https://docs.astral.sh/uv/)** (рекомендуется) либо классический `pip`
-- **PostgreSQL** (запущенный локально или в Docker)
-
-> **Подсказка по установке `uv`:**
-> ```bash
-> # Linux / macOS
-> curl -LsSf https://astral.sh/uv/install.sh | sh
-> ```
-
----
-
-### 2. Клонирование репозитория и установка зависимостей
-
-```bash
-git clone <URL_РЕПОЗИТОРИЯ>
-cd python-fastapi
-
-# Установка всех зависимостей проекта и создание виртуального окружения (.venv)
-uv sync
-```
-
-*(Если вы используете стандартный `pip`):*
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -e .
-```
-
----
-
-### 3. Настройка переменных окружения
-
-Скопируйте шаблон файла конфигурации `.env.example` в `.env`:
+Создайте файл `.env` в корне проекта (скопируйте из шаблона):
 
 ```bash
 cp .env.example .env
 ```
 
-Отредактируйте `.env`, указав параметры вашей базы данных:
+Заполните ваши реквизиты доступа к Supabase в `.env`:
 
 ```env
-user=postgres
-password=postgres
-host=localhost
+user=postgres.<project-ref>
+password=your-supabase-db-password
+host=aws-0-eu-west-1.pooler.supabase.com
 port=5432
 dbname=postgres
-ssl_mode=disable
+ssl_mode=require
 ```
 
-> **Примечание:** Если у вас локальный PostgreSQL без SSL-сертификата, обязательно укажите `ssl_mode=disable`.
+### 2. Запуск контейнеров
+
+Для первого запуска или после изменения зависимостей/Dockerfile используйте флаг `--build`:
+
+```bash
+docker compose up -d --build
+```
+
+> **Примечание:** При последующих запусках, если зависимости не менялись, достаточно выполнить `docker compose up -d`. Код подмонтирован в контейнеры, поэтому правки применяются на лету (hot-reload).
+
+### 3. Доступ к сервисам
+
+После успешного старта будут доступны:
+
+| Сервис | URL | Описание |
+|---|---|---|
+| **Frontend** | [http://localhost:5173](http://localhost:5173) | Vite Dev Server (React) |
+| **Backend API** | [http://localhost:8000](http://localhost:8000) | FastAPI сервер |
+| **Swagger UI** | [http://localhost:8000/docs](http://localhost:8000/docs) | Интерактивная документация API |
+| **Health Check** | [http://localhost:8000/health](http://localhost:8000/health) | Проверка работоспособности бэкенда |
+
+### 4. Просмотр логов
+
+```bash
+# Логи всех сервисов
+docker compose logs -f
+
+# Логи конкретного сервиса
+docker compose logs -f backend
+docker compose logs -f frontend
+```
+
+### 5. Остановка сервисов
+
+```bash
+docker compose down
+```
 
 ---
 
-### 4. Запуск PostgreSQL (если нет готовой БД)
+## 🗄 Работа с базой данных и миграциями (Alembic)
 
-Быстрее всего поднять локальную базу через Docker:
+Миграции применяются напрямую к вашей базе в **Supabase**. Все команды можно выполнять как через запущенный Docker-контейнер, так и локально.
+
+### Применение миграций
 
 ```bash
-docker run -d \
-  --name fastapi-postgres \
-  -e POSTGRES_USER=postgres \
-  -e POSTGRES_PASSWORD=postgres \
-  -e POSTGRES_DB=postgres \
-  -p 5432:5432 \
-  postgres:16-alpine
+# Через Docker:
+docker compose exec backend uv run alembic upgrade head
+
+# Локально:
+cd backend && uv run alembic upgrade head
+```
+
+### Создание новой миграции (autogenerate)
+
+После добавления или редактирования SQLAlchemy моделей в `backend/src/allur_factory/models/`:
+
+```bash
+# Через Docker:
+docker compose exec backend uv run alembic revision --autogenerate -m "описание_изменений"
+
+# Локально:
+cd backend && uv run alembic revision --autogenerate -m "описание_изменений"
+```
+
+### Откат миграции
+
+```bash
+# Откат на 1 шаг назад:
+docker compose exec backend uv run alembic downgrade -1
 ```
 
 ---
 
-### 5. Применение миграций базы данных
+## 💻 Локальный запуск без Docker
 
-Перед первым запуском приложения создайте таблицы в базе данных с помощью Alembic:
+Если вы предпочитаете запускать сервисы нативно на хост-машине:
+
+### Требования
+- **Python**: `>= 3.12` и пакетный менеджер [uv](https://docs.astral.sh/uv/)
+- **Node.js**: `>= 20` и пакетный менеджер [pnpm](https://pnpm.io/)
+
+### Запуск Backend
 
 ```bash
-# Через uv
-uv run alembic upgrade head
+cd backend
 
-# Либо с активированным виртуальным окружением
+# 1. Создание виртуального окружения и установка зависимостей
+uv sync
+
+# 2. Активация виртуального окружения:
+# Для Linux / macOS:
+source .venv/bin/activate
+
+# Для Windows (PowerShell):
+.venv\Scripts\Activate.ps1
+# Для Windows (CMD):
+.venv\Scripts\activate.bat
+
+# 3. Применение миграций к БД
 alembic upgrade head
+# или без активации окружения: uv run alembic upgrade head
+
+# 4. Запуск сервера разработки с перезагрузкой
+uvicorn allur_factory.main:app --reload --host 0.0.0.0 --port 8000
+# или без активации окружения: uv run uvicorn allur_factory.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+### Запуск Frontend
+
+```bash
+cd frontend
+
+# Установка зависимостей
+pnpm install
+
+# Запуск dev-сервера
+pnpm dev
 ```
 
 ---
 
-### 6. Запуск сервера разработки
+## 🏭 Production сборка (Docker)
 
-Запустите сервер приложения:
+Для запуска production-окружения (бэкенд без автоперезагрузки, фронтенд собран в статику и раздаётся через Nginx на 80 порту):
 
 ```bash
-# Вариант 1 (через зарегистрированный скрипт проекта):
-uv run python-fastapi
-
-# Вариант 2 (напрямую через uvicorn):
-uv run uvicorn python_fastapi.main:app --host 127.0.0.1 --port 8000 --reload
+docker compose -f docker-compose.prod.yml up -d --build
 ```
 
-После старта сервер будет доступен по адресу: **http://127.0.0.1:8000**
+- **Frontend (Nginx)**: [http://localhost](http://localhost) (порт 80)
+- **Backend API**: [http://localhost:8000](http://localhost:8000)
 
----
-
-## 📖 Документация API
-
-FastAPI автоматически генерирует интерактивную документацию:
-
-- **Swagger UI**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) — интерактивное тестирование всех эндпоинтов прямо из браузера.
-- **ReDoc**: [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc) — альтернативная визуализация спецификации OpenAPI.
-
----
-
-## 📌 Доступные эндпоинты
-
-### Health Check (Проверка состояния)
-| Метод | Эндпоинт | Описание |
-| :--- | :--- | :--- |
-| `GET` | `/health/` | Проверка доступности сервиса (возвращает `{"message": "Server is fine!"}`) |
-
-### Задачи (Tasks)
-| Метод | Эндпоинт | Описание |
-| :--- | :--- | :--- |
-| `GET` | `/tasks/` | Получить список всех задач |
-| `POST` | `/tasks/` | Создать новую задачу |
-| `GET` | `/tasks/{task_id}` | Получить задачу по её ID |
-| `PATCH`| `/tasks/{task_id}` | Частично обновить задачу (`title`, `completed`) |
-| `DELETE`| `/tasks/{task_id}` | Удалить задачу по ID |
-
----
-
-## 💡 Примеры работы с API (cURL)
-
-#### 1. Создать задачу
+Остановка:
 ```bash
-curl -X POST "http://127.0.0.1:8000/tasks/" \
-  -H "Content-Type: application/json" \
-  -d '{"title": "Изучить FastAPI и SQLAlchemy"}'
-```
-*Ответ (201 Created):*
-```json
-{
-  "id": "e4b6c31f-0fb3-4b68-8cf9-c3c2f0f4a82a",
-  "title": "Изучить FastAPI и SQLAlchemy",
-  "completed": false
-}
-```
-
-#### 2. Получить список всех задач
-```bash
-curl -X GET "http://127.0.0.1:8000/tasks/"
-```
-
-#### 3. Обновить статус задачи (отметить как выполненную)
-```bash
-curl -X PATCH "http://127.0.0.1:8000/tasks/<TASK_ID>" \
-  -H "Content-Type: application/json" \
-  -d '{"completed": true}'
-```
-
-#### 4. Удалить задачу
-```bash
-curl -X DELETE "http://127.0.0.1:8000/tasks/<TASK_ID>"
+docker compose -f docker-compose.prod.yml down
 ```
 
 ---
 
-## 🔧 Команды для разработки
+## 💡 Полезные команды
 
-### Проверка и форматирование кода (Ruff)
-```bash
-# Проверка линтером с автоисправлением
-uv run ruff check --fix
-
-# Автоматическое форматирование кода
-uv run ruff format
-```
-
-### Настройка Git pre-commit хуков
-В репозитории настроен `pre-commit`, который проверяет файлы и форматирует код перед каждым коммитом:
-```bash
-# Установка хуков в репозиторий
-uv run pre-commit install
-
-# Ручной запуск проверки всех файлов
-uv run pre-commit run --all-files
-```
-
-### Создание новых миграций Alembic
-Если вы добавили или изменили модели в `models/`:
-```bash
-uv run alembic revision --autogenerate -m "описание изменений"
-uv run alembic upgrade head
-```
+- **Линтинг и форматирование бэкенда**:
+  ```bash
+  cd backend && uv run ruff check . && uv run ruff format .
+  ```
+- **Линтинг фронтенда**:
+  ```bash
+  cd frontend && pnpm lint
+  ```
+- **Сборка фронтенда для проверки типов**:
+  ```bash
+  cd frontend && pnpm build
+  ```
+- **Перезапуск отдельного контейнера**:
+  ```bash
+  docker compose restart backend
+  docker compose restart frontend
+  ```
