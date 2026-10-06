@@ -1,7 +1,7 @@
-import router from "@/routing/Routes";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
-import { RouterProvider } from "react-router";
+import router from '@/routing/Routes';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useState } from 'react';
+import { RouterProvider } from 'react-router';
 
 export const RootProvider = () => {
   const [queryClient] = useState(

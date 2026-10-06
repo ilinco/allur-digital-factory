@@ -21,21 +21,21 @@ export const DashboardHeader = ({
         : selectedDate;
 
   return (
-    <header className="flex flex-col gap-3 border-b border-slate-200 bg-white px-4 py-4 sm:px-6 sm:flex-row sm:items-center sm:justify-between">
+    <header className="flex flex-col gap-3.5 px-4 pt-4 pb-2 sm:px-6 sm:pt-6 sm:pb-3 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h1 className="text-2xl font-medium tracking-tight text-slate-900">
+        <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900">
           Аналитика производства
         </h1>
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 p-1 text-sm font-medium text-slate-600">
+        <div className="flex items-center rounded-xl border border-neutral-200/90 bg-white p-1 text-sm font-medium text-slate-600 shadow-2xs">
           <button
             type="button"
             onClick={() => onSelectDate('2026-10-01')}
-            className={`rounded-lg px-3.5 py-1.5 transition-colors ${
+            className={`cursor-pointer rounded-lg px-3.5 py-1.5 transition-colors ${
               selectedDate === '2026-10-01'
-                ? 'bg-white text-slate-900 font-semibold shadow-xs'
+                ? 'bg-neutral-100 text-slate-900 font-semibold'
                 : 'text-slate-500 hover:text-slate-900'
             }`}
           >
@@ -44,9 +44,9 @@ export const DashboardHeader = ({
           <button
             type="button"
             onClick={() => onSelectDate('2026-10-02')}
-            className={`rounded-lg px-3.5 py-1.5 transition-colors ${
+            className={`cursor-pointer rounded-lg px-3.5 py-1.5 transition-colors ${
               selectedDate === '2026-10-02'
-                ? 'bg-white text-slate-900 font-semibold shadow-xs'
+                ? 'bg-neutral-100 text-slate-900 font-semibold'
                 : 'text-slate-500 hover:text-slate-900'
             }`}
           >
@@ -54,14 +54,14 @@ export const DashboardHeader = ({
           </button>
         </div>
 
-        <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-slate-600 shadow-xs">
+        <div className="flex items-center gap-2 rounded-xl border border-neutral-200/90 bg-white px-3.5 py-2 text-sm font-medium text-slate-600 shadow-2xs">
           <IconCalendar size={17} className="text-slate-400" />
           <span>Обновлено: {formattedDate}</span>
           <button
             type="button"
             onClick={onRefresh}
             title="Обновить данные"
-            className="ml-1 rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+            className="cursor-pointer ml-1 rounded-md p-1 text-slate-400 transition-colors hover:bg-neutral-100 hover:text-slate-700"
           >
             <IconRefresh
               size={17}

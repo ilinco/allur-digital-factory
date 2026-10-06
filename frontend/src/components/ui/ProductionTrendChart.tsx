@@ -1,5 +1,5 @@
-import type { HourlyPacePoint } from "@/types/dashboard";
-import { useState } from "react";
+import type { HourlyPacePoint } from '@/types/dashboard';
+import { useState } from 'react';
 import {
   Area,
   AreaChart,
@@ -8,7 +8,7 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-} from "recharts";
+} from 'recharts';
 
 interface ProductionTrendChartProps {
   data: HourlyPacePoint[];
@@ -59,13 +59,13 @@ export const ProductionTrendChart = ({
   totalFact = 346,
   totalPlan = 360,
 }: ProductionTrendChartProps) => {
-  const [interval, setInterval] = useState<string>("shift1");
+  const [interval, setInterval] = useState<string>('shift1');
 
   return (
     <div className="flex h-full flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-lg font-bold text-slate-900">
+          <h2 className="text-lg font-medium text-slate-900">
             Динамика выпуска продукции
           </h2>
           <div className="mt-1.5 flex flex-wrap items-center gap-4 text-sm font-medium">
@@ -89,7 +89,7 @@ export const ProductionTrendChart = ({
           <select
             value={interval}
             onChange={(e) => setInterval(e.target.value)}
-            className="rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-1.5 text-sm font-medium text-slate-700 outline-none focus:border-slate-400"
+            className="cursor-pointer rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-1.5 text-sm font-medium text-slate-700 outline-none focus:border-slate-400"
           >
             <option value="shift1">Смена 1 (08:00 - 20:00)</option>
             <option value="shift2">Смена 2 (20:00 - 08:00)</option>
@@ -119,13 +119,13 @@ export const ProductionTrendChart = ({
               dataKey="time"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "#64748b", fontSize: 13, fontWeight: 500 }}
+              tick={{ fill: '#64748b', fontSize: 13, fontWeight: 500 }}
             />
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "#64748b", fontSize: 13, fontWeight: 500 }}
-              domain={[0, "auto"]}
+              tick={{ fill: '#64748b', fontSize: 13, fontWeight: 500 }}
+              domain={[0, 'auto']}
             />
             <Tooltip content={<CustomTooltip />} />
             <Area
@@ -144,8 +144,8 @@ export const ProductionTrendChart = ({
               fill="url(#factGradient)"
               activeDot={{
                 r: 6,
-                fill: "#ff2e1f",
-                stroke: "#ffffff",
+                fill: '#ff2e1f',
+                stroke: '#ffffff',
                 strokeWidth: 2,
               }}
             />

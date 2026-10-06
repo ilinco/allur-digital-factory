@@ -1,13 +1,13 @@
-import type { StationStatus } from "@/types/dashboard";
-import { IconDotsVertical } from "@tabler/icons-react";
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import type { StationStatus } from '@/types/dashboard';
+import { IconDotsVertical } from '@tabler/icons-react';
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 
 interface DefectDistributionCardProps {
   stations: StationStatus[];
   totalDefects: number;
 }
 
-const COLORS = ["#ff2e1f", "#ff6b5f", "#ffb4ad", "#cbd5e1"];
+const COLORS = ['#ff2e1f', '#ff6b5f', '#ffb4ad', '#cbd5e1'];
 
 export const DefectDistributionCard = ({
   stations,
@@ -28,12 +28,12 @@ export const DefectDistributionCard = ({
   return (
     <div className="flex h-full flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-slate-900">
+        <h2 className="text-lg font-medium text-slate-900">
           Распределение дефектов
         </h2>
         <button
           type="button"
-          className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+          className="cursor-pointer rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
         >
           <IconDotsVertical size={18} stroke={1.75} />
         </button>
@@ -60,10 +60,10 @@ export const DefectDistributionCard = ({
             <Tooltip
               formatter={(value, name) => [`${value} шт.`, `${name}`]}
               contentStyle={{
-                backgroundColor: "#ffffff",
-                borderRadius: "12px",
-                borderColor: "#e2e8f0",
-                fontSize: "13px",
+                backgroundColor: '#ffffff',
+                borderRadius: '12px',
+                borderColor: '#e2e8f0',
+                fontSize: '13px',
                 fontWeight: 500,
               }}
             />
@@ -74,9 +74,7 @@ export const DefectDistributionCard = ({
           <span className="text-2xl font-bold tracking-tight text-slate-900">
             {totalDefects} шт.
           </span>
-          <span className="text-xs font-medium text-slate-500">
-            Всего брак
-          </span>
+          <span className="text-xs font-medium text-slate-500">Всего брак</span>
         </div>
       </div>
 
@@ -86,7 +84,7 @@ export const DefectDistributionCard = ({
           const share =
             totalDefects > 0
               ? ((defects / totalDefects) * 100).toFixed(0)
-              : "0";
+              : '0';
 
           return (
             <div

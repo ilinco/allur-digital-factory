@@ -33,16 +33,16 @@ export const HomePage = () => {
         isRefreshing={isFetching}
       />
 
-      <main className="flex-1 p-3.5 sm:p-5">
-        <div className="flex w-full flex-col gap-3.5">
+      <main className="flex-1 px-4 pb-4 sm:px-6 sm:pb-6">
+        <div className="flex w-full flex-col gap-4 sm:gap-5">
           {isLoading ? (
-            <div className="space-y-3.5 animate-pulse">
+            <div className="space-y-4 animate-pulse">
               <div className="h-28 rounded-2xl border border-slate-200 bg-white" />
-              <div className="grid grid-cols-1 gap-3.5 lg:grid-cols-12">
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
                 <div className="h-80 rounded-2xl border border-slate-200 bg-white lg:col-span-8" />
                 <div className="h-80 rounded-2xl border border-slate-200 bg-white lg:col-span-4" />
               </div>
-              <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2 xl:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                 <div className="h-72 rounded-2xl border border-slate-200 bg-white" />
                 <div className="h-72 rounded-2xl border border-slate-200 bg-white" />
                 <div className="h-72 rounded-2xl border border-slate-200 bg-white" />
@@ -59,7 +59,7 @@ export const HomePage = () => {
               <button
                 type="button"
                 onClick={refetchAll}
-                className="mt-4 rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800"
+                className="mt-4 cursor-pointer rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800"
               >
                 Повторить попытку
               </button>
@@ -75,7 +75,7 @@ export const HomePage = () => {
               />
 
               {/* Middle Section: Main Chart (65%) + Models Progress (35%) */}
-              <div className="grid grid-cols-1 gap-3.5 lg:grid-cols-12">
+              <div className="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-12">
                 <div className="lg:col-span-7 xl:col-span-8">
                   <ProductionTrendChart
                     data={hourlyPace}
@@ -89,7 +89,7 @@ export const HomePage = () => {
               </div>
 
               {/* Bottom Section: 3 equal cards */}
-              <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2 xl:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2 xl:grid-cols-3">
                 <DefectDistributionCard
                   stations={stations}
                   totalDefects={totalDefects}

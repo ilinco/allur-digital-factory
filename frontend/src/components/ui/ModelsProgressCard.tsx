@@ -1,14 +1,14 @@
-import type { ModelProgress } from "@/types/dashboard";
-import { IconDotsVertical } from "@tabler/icons-react";
+import type { ModelProgress } from '@/types/dashboard';
+import { IconDotsVertical } from '@tabler/icons-react';
 
 interface ModelsProgressCardProps {
   models: ModelProgress[];
 }
 
 const MODEL_COLORS = [
-  { bar: "bg-[#ff2e1f]", dot: "bg-[#ff2e1f]", text: "text-[#ff2e1f]" },
-  { bar: "bg-[#ff6b5f]", dot: "bg-[#ff6b5f]", text: "text-[#ff6b5f]" },
-  { bar: "bg-[#ffb4ad]", dot: "bg-[#ffb4ad]", text: "text-[#ffb4ad]" },
+  { bar: 'bg-[#ff2e1f]', dot: 'bg-[#ff2e1f]', text: 'text-[#ff2e1f]' },
+  { bar: 'bg-[#ff6b5f]', dot: 'bg-[#ff6b5f]', text: 'text-[#ff6b5f]' },
+  { bar: 'bg-[#ffb4ad]', dot: 'bg-[#ffb4ad]', text: 'text-[#ffb4ad]' },
 ];
 
 export const ModelsProgressCard = ({ models }: ModelsProgressCardProps) => {
@@ -21,12 +21,12 @@ export const ModelsProgressCard = ({ models }: ModelsProgressCardProps) => {
     <div className="flex h-full flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
       <div>
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-slate-900">
+          <h2 className="text-lg font-medium text-slate-900">
             План производства по моделям
           </h2>
           <button
             type="button"
-            className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            className="cursor-pointer rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
           >
             <IconDotsVertical size={18} stroke={1.75} />
           </button>
@@ -34,7 +34,7 @@ export const ModelsProgressCard = ({ models }: ModelsProgressCardProps) => {
 
         <div className="mt-4">
           <p className="text-3xl font-bold tracking-tight text-slate-900">
-            {totalTarget.toLocaleString("ru-RU")} шт.
+            {totalTarget.toLocaleString('ru-RU')} шт.
           </p>
           <p className="mt-1 text-sm font-medium text-emerald-600">
             ↑ Месячная программа завода Allur
@@ -63,7 +63,7 @@ export const ModelsProgressCard = ({ models }: ModelsProgressCardProps) => {
         {models.map((item, idx) => {
           const target = item.target_monthly || item.target || 0;
           const sharePercent =
-            totalTarget > 0 ? ((target / totalTarget) * 100).toFixed(1) : "0";
+            totalTarget > 0 ? ((target / totalTarget) * 100).toFixed(1) : '0';
           const color = MODEL_COLORS[idx % MODEL_COLORS.length];
 
           return (
@@ -79,7 +79,7 @@ export const ModelsProgressCard = ({ models }: ModelsProgressCardProps) => {
               </div>
               <div className="flex items-center gap-2 font-medium">
                 <span className="font-semibold text-slate-900">
-                  {target.toLocaleString("ru-RU")} шт.
+                  {target.toLocaleString('ru-RU')} шт.
                 </span>
                 <span className="text-slate-400">({sharePercent}%)</span>
               </div>

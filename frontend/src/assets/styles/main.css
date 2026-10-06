@@ -7,4 +7,51 @@
 
 body {
   font-family: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: #f6f6f6;
 }
+
+/* На всех UI элементах должен быть cursor pointer */
+button,
+[role="button"],
+[role="tab"],
+[role="switch"],
+[role="menuitem"],
+[role="link"],
+select,
+summary,
+a,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+input[type="checkbox"],
+input[type="radio"],
+input[type="range"],
+label[for],
+label:has(input) {
+  cursor: pointer;
+}
+
+button:disabled,
+[aria-disabled="true"],
+input:disabled,
+select:disabled {
+  cursor: not-allowed;
+}
+
+/* На мобильных экранах отключен hover */
+@custom-variant hover {
+  @media (hover: hover) and (pointer: fine) and (min-width: 768px) {
+    &:hover {
+      @slot;
+    }
+  }
+}
+
+@custom-variant group-hover {
+  @media (hover: hover) and (pointer: fine) and (min-width: 768px) {
+    :merge(.group):hover & {
+      @slot;
+    }
+  }
+}
+

@@ -1,5 +1,5 @@
-import type { StationStatus } from "@/types/dashboard";
-import { IconDotsVertical } from "@tabler/icons-react";
+import type { StationStatus } from '@/types/dashboard';
+import { IconDotsVertical } from '@tabler/icons-react';
 
 interface StationsLoadCardProps {
   stations: StationStatus[];
@@ -15,12 +15,12 @@ export const StationsLoadCard = ({ stations }: StationsLoadCardProps) => {
     <div className="flex h-full flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
       <div>
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-slate-900">
+          <h2 className="text-lg font-medium text-slate-900">
             Загрузка участков
           </h2>
           <button
             type="button"
-            className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            className="cursor-pointer rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
           >
             <IconDotsVertical size={18} stroke={1.75} />
           </button>
