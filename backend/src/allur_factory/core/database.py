@@ -1,6 +1,8 @@
+import logging
 from collections.abc import AsyncGenerator
 
 from fastapi import Depends
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import (
 	AsyncSession,
 	async_sessionmaker,
@@ -8,6 +10,8 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from allur_factory.core.config import settings
+
+logger = logging.getLogger(__name__)
 
 DATABASE_URL = settings.database_url
 
@@ -28,7 +32,10 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 		try:
 			yield session
 		except Exception:
-			await session.rollback()
+			try:
+				await session.rollback()
+			except SQLAlchemyError as err:
+				logger.warning('Failed to rollback session: %s', err)
 			raise
 
 

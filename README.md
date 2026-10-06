@@ -173,8 +173,12 @@ docker compose -f docker-compose.prod.yml down
 
 ---
 
-## 💡 Полезные команды
-
+- **Запуск тестов бэкенда**:
+  ```bash
+  cd backend && uv run pytest
+  # или через Docker:
+  docker compose exec backend uv run pytest
+  ```
 - **Линтинг и форматирование бэкенда**:
   ```bash
   cd backend && uv run ruff check . && uv run ruff format .

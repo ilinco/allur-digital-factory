@@ -73,7 +73,19 @@ uv run alembic revision --autogenerate -m "initial migration"
 uv run alembic upgrade head
 ```
 
-### 4. Запуск сервера разработки
+### 4. Запуск сида тестовых данных
+
+Для наполнения базы данных тестовыми данными из кейса:
+
+```bash
+uv run seed
+# или
+uv run python seed.py
+# или указать путь к файлу явно:
+uv run seed --docx /home/nick/Downloads/Кейс_Цифровой_двойник_Тестовые_данные.docx
+```
+
+### 5. Запуск сервера разработки
 
 ```bash
 uv run uvicorn allur_factory.main:app --reload --host 0.0.0.0 --port 8000
@@ -82,3 +94,13 @@ uv run allur_factory
 ```
 
 Документация Swagger UI будет доступна по адресу: [http://localhost:8000/docs](http://localhost:8000/docs)
+
+### 6. Запуск тестов
+
+```bash
+uv run pytest
+# или с подробным выводом:
+uv run pytest -v
+# или через стандартный модуль unittest:
+uv run python -m unittest discover tests
+```
