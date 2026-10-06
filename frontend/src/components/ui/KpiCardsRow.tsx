@@ -1,12 +1,12 @@
 import {
   IconAlertCircle,
-  IconCar,
   IconClipboardCheck,
   IconClockPause,
   IconGauge,
-} from "@tabler/icons-react";
-import { KpiCard } from "./KpiCard";
-import type { KpiSummaryResponse, StationStatus } from "@/types/dashboard";
+  IconPackage,
+} from '@tabler/icons-react';
+import { KpiCard } from './KpiCard';
+import type { KpiSummaryResponse, StationStatus } from '@/types/dashboard';
 
 interface KpiCardsRowProps {
   kpi?: KpiSummaryResponse;
@@ -29,7 +29,7 @@ export const KpiCardsRow = ({
   const downtimeMin = kpi?.total_downtime_min ?? 85;
 
   const fulfillmentPercent =
-    totalPlan > 0 ? ((totalFact / totalPlan) * 100).toFixed(1) : "0.0";
+    totalPlan > 0 ? ((totalFact / totalPlan) * 100).toFixed(1) : '0.0';
 
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs">
@@ -40,16 +40,16 @@ export const KpiCardsRow = ({
           value={`${oee}%`}
           delta={oeeDiff >= 0 ? `+${oeeDiff}%` : `${oeeDiff}%`}
           deltaPeriod={`vs цели (${targetOee}%)`}
-          deltaType={oeeDiff >= 0 ? "positive" : "negative"}
+          deltaType={oeeDiff >= 0 ? 'positive' : 'negative'}
         />
 
         <KpiCard
-          icon={<IconCar size={22} stroke={1.75} />}
+          icon={<IconPackage stroke={1.75} size={22} />}
           title="Фактический выпуск"
           value={`${totalFact} шт.`}
           delta={`+${fulfillmentPercent}%`}
           deltaPeriod="выполнение плана"
-          deltaType={Number(fulfillmentPercent) >= 95 ? "positive" : "neutral"}
+          deltaType={Number(fulfillmentPercent) >= 95 ? 'positive' : 'neutral'}
         />
 
         <KpiCard
@@ -65,9 +65,9 @@ export const KpiCardsRow = ({
           icon={<IconClockPause size={22} stroke={1.75} />}
           title="Время простоев"
           value={`${downtimeMin} мин`}
-          delta={downtimeMin > 60 ? "+25 мин" : "-15 мин"}
-          deltaPeriod={downtimeMin > 60 ? "превышение SLA" : "в норме SLA"}
-          deltaType={downtimeMin > 60 ? "negative" : "positive"}
+          delta={downtimeMin > 60 ? '+25 мин' : '-15 мин'}
+          deltaPeriod={downtimeMin > 60 ? 'превышение SLA' : 'в норме SLA'}
+          deltaType={downtimeMin > 60 ? 'negative' : 'positive'}
         />
 
         <KpiCard
@@ -76,7 +76,7 @@ export const KpiCardsRow = ({
           value={`${avgDefectPercent}%`}
           delta={`${totalDefects} ед.`}
           deltaPeriod="отбраковано"
-          deltaType={avgDefectPercent <= 2.5 ? "positive" : "negative"}
+          deltaType={avgDefectPercent <= 2.5 ? 'positive' : 'negative'}
         />
       </div>
     </div>
