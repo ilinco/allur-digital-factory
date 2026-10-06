@@ -1,20 +1,26 @@
 import asyncio
+import sys
 from logging.config import fileConfig
+from pathlib import Path
 
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
-from allur_factory.main import DATABASE_URL
-from allur_factory.models.base import Base
+
+# Ensure backend/src is on sys.path
+BASE_DIR = Path(__file__).resolve().parent.parent
+SRC_DIR = BASE_DIR / 'src'
+if str(SRC_DIR) not in sys.path:
+	sys.path.insert(0, str(SRC_DIR))
+
+from allur_factory.core.config import settings
+from allur_factory.models import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-
-if DATABASE_URL:
-	config.set_main_option('sqlalchemy.url', DATABASE_URL.replace('%', '%%'))
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -25,10 +31,9 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 target_metadata = Base.metadata
 
-# other values from the config, defined by the needs of env.py,
-# can be acquired:
-my_important_option = config.get_main_option('my_important_option')
-# ... etc.
+# Set database URL dynamically from application settings
+if settings.database_url:
+	config.set_main_option('sqlalchemy.url', settings.database_url.replace('%', '%%'))
 
 
 def run_migrations_offline() -> None:
@@ -41,14 +46,15 @@ def run_migrations_offline() -> None:
 
 	Calls to context.execute() here emit the given string to the
 	script output.
-
 	"""
-	url = config.get_main_option('sqlalchemy.url')
+	url = settings.database_url
 	context.configure(
 		url=url,
 		target_metadata=target_metadata,
 		literal_binds=True,
 		dialect_opts={'paramstyle': 'named'},
+		compare_type=True,
+		compare_server_default=True,
 	)
 
 	with context.begin_transaction():
@@ -56,7 +62,12 @@ def run_migrations_offline() -> None:
 
 
 def do_run_migrations(connection: Connection) -> None:
-	context.configure(connection=connection, target_metadata=target_metadata)
+	context.configure(
+		connection=connection,
+		target_metadata=target_metadata,
+		compare_type=True,
+		compare_server_default=True,
+	)
 
 	with context.begin_transaction():
 		context.run_migrations()
@@ -65,11 +76,12 @@ def do_run_migrations(connection: Connection) -> None:
 async def run_async_migrations() -> None:
 	"""In this scenario we need to create an Engine
 	and associate a connection with the context.
-
 	"""
+	configuration = config.get_section(config.config_ini_section, {})
+	configuration['sqlalchemy.url'] = settings.database_url
 
 	connectable = async_engine_from_config(
-		config.get_section(config.config_ini_section, {}),
+		configuration,
 		prefix='sqlalchemy.',
 		poolclass=pool.NullPool,
 	)
@@ -82,7 +94,6 @@ async def run_async_migrations() -> None:
 
 def run_migrations_online() -> None:
 	"""Run migrations in 'online' mode."""
-
 	asyncio.run(run_async_migrations())
 
 

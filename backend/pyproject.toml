@@ -3,9 +3,7 @@ name = "allur_factory"
 version = "0.1.0"
 description = "Allur digital factory"
 readme = "README.md"
-authors = [
-    { name = "ilinco", email = "kily_of@proton.me" }
-]
+authors = [{ name = "ilinco", email = "kily_of@proton.me" }]
 requires-python = ">=3.12"
 dependencies = [
     "alembic>=1.20.0",
@@ -25,7 +23,4 @@ requires = ["uv_build>=0.12.22,<0.13.0"]
 build-backend = "uv_build"
 
 [dependency-groups]
-dev = [
-    "pre-commit>=4.6.2",
-    "ruff>=0.16.10",
-]
+dev = ["pre-commit>=4.6.2", "ruff>=0.16.10"]

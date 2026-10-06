@@ -12,8 +12,8 @@ class Settings(BaseSettings):
 		extra='ignore',
 	)
 
-	PROJECT_NAME: str = 'Python FastAPI App'
-	CORS_ALLOW_ORIGINS: list[str] = ['']
+	PROJECT_NAME: str = 'Allur Digital Factory'
+	CORS_ALLOW_ORIGINS: list[str] = ['http://localhost:5173']
 	DB_ECHO: bool = False
 
 	user: str = Field(
