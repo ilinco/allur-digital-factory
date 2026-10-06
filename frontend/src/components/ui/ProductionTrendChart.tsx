@@ -62,13 +62,13 @@ export const ProductionTrendChart = ({
   const [interval, setInterval] = useState<string>('shift1');
 
   return (
-    <div className="flex h-full flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex h-full flex-col justify-between rounded-2xl border border-slate-200 bg-white shadow-xs">
+      <div className="flex flex-col gap-3 border-b border-slate-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-lg font-medium text-slate-900">
+          <h2 className="text-base font-semibold text-slate-900">
             Динамика выпуска продукции
           </h2>
-          <div className="mt-1.5 flex flex-wrap items-center gap-4 text-sm font-medium">
+          <div className="mt-1 flex flex-wrap items-center gap-4 text-sm font-medium">
             <div className="flex items-center gap-2">
               <span className="h-2.5 w-2.5 rounded-full bg-[#ff2e1f]" />
               <span className="font-medium text-slate-700">
@@ -98,7 +98,8 @@ export const ProductionTrendChart = ({
         </div>
       </div>
 
-      <div className="mt-5 h-64 w-full">
+      <div className="flex flex-1 flex-col justify-between p-5">
+        <div className="h-64 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
             data={data}
@@ -153,5 +154,6 @@ export const ProductionTrendChart = ({
         </ResponsiveContainer>
       </div>
     </div>
+  </div>
   );
 };

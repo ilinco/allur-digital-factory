@@ -18,28 +18,30 @@ export const ModelsProgressCard = ({ models }: ModelsProgressCardProps) => {
   );
 
   return (
-    <div className="flex h-full flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
-      <div>
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-medium text-slate-900">
-            План производства по моделям
-          </h2>
-          <button
-            type="button"
-            className="cursor-pointer rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-          >
-            <IconDotsVertical size={18} stroke={1.75} />
-          </button>
-        </div>
+    <div className="flex h-full flex-col justify-between rounded-2xl border border-slate-200 bg-white shadow-xs">
+      <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+        <h2 className="text-base font-semibold text-slate-900">
+          План производства по моделям
+        </h2>
+        <button
+          type="button"
+          className="cursor-pointer rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+          title="Параметры"
+        >
+          <IconDotsVertical size={18} stroke={1.75} />
+        </button>
+      </div>
 
-        <div className="mt-4">
-          <p className="text-3xl font-bold tracking-tight text-slate-900">
-            {totalTarget.toLocaleString('ru-RU')} шт.
-          </p>
-          <p className="mt-1 text-sm font-medium text-emerald-600">
-            ↑ Месячная программа завода Allur
-          </p>
-        </div>
+      <div className="flex flex-1 flex-col justify-between p-5">
+        <div>
+          <div>
+            <p className="text-3xl font-bold tracking-tight text-slate-900">
+              {totalTarget.toLocaleString('ru-RU')} шт.
+            </p>
+            <p className="mt-1 text-sm font-medium text-emerald-600">
+              ↑ Месячная программа завода Allur
+            </p>
+          </div>
 
         {/* Segmented Progress Bar */}
         <div className="mt-4 flex h-3.5 w-full overflow-hidden rounded-full bg-slate-100">
@@ -88,5 +90,6 @@ export const ModelsProgressCard = ({ models }: ModelsProgressCardProps) => {
         })}
       </div>
     </div>
+  </div>
   );
 };
