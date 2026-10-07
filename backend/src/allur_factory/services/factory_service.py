@@ -1,7 +1,7 @@
 from datetime import date
 
 from allur_factory.repositories.production import ProductionRepository
-from allur_factory.schemas.factory import PipelineResponse, StationStatus
+from allur_factory.schemas.factory import PipelineResponse, StationSlaStatus, StationStatus
 
 LINE_NAME_TO_ID: dict[str, str] = {
 	'сварка': 'welding-1',
@@ -25,7 +25,7 @@ LINE_NAME_TO_ID: dict[str, str] = {
 }
 
 
-def determine_station_status(downtime_minutes: int, defect_percent: float) -> str:
+def determine_station_status(downtime_minutes: int, defect_percent: float) -> StationSlaStatus:
 	"""Determine SLA status for a station.
 
 	- critical: downtime > 60 min or defect > 5%

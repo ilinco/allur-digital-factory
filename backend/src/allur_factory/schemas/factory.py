@@ -2,11 +2,15 @@ from typing import Literal
 
 from pydantic import BaseModel
 
+StationSlaStatus = Literal['normal', 'warning', 'critical']
+LayoutStatus = Literal['normal', 'warning', 'critical', 'no_data']
+SectionType = Literal['process', 'warehouse']
+
 
 class StationStatus(BaseModel):
 	id: str
 	name: str
-	status: str  # "normal" | "warning" | "critical"
+	status: StationSlaStatus
 	fact: int
 	plan: int
 	load_percent: float
@@ -19,6 +23,15 @@ class PipelineResponse(BaseModel):
 	stations: list[StationStatus]
 
 
+class ModelProgressItem(BaseModel):
+	model_name: str
+	target_monthly: int
+	produced_fact: int
+	target: int
+	fact: int
+	percent: float
+
+
 class KpiSummaryResponse(BaseModel):
 	record_date: str
 	overall_oee: float
@@ -26,11 +39,7 @@ class KpiSummaryResponse(BaseModel):
 	total_fact: int
 	total_plan: int
 	total_downtime_min: int
-	models_progress: list[dict]
-
-
-LayoutStatus = Literal['normal', 'warning', 'critical', 'no_data']
-SectionType = Literal['process', 'warehouse']
+	models_progress: list[ModelProgressItem]
 
 
 class DowntimeEvent(BaseModel):

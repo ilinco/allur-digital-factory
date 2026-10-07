@@ -1,6 +1,7 @@
 from collections import defaultdict
 from collections.abc import Sequence
 from datetime import date
+from typing import cast
 
 from allur_factory.core.exceptions import NotFoundException
 from allur_factory.models import Downtime, ProductionLine, ShiftMetric
@@ -9,8 +10,10 @@ from allur_factory.schemas.factory import (
 	DowntimeEvent,
 	EquipmentNode,
 	FactoryLayoutResponse,
+	LayoutStatus,
 	SectionMetrics,
 	SectionNode,
+	SectionType,
 )
 from allur_factory.services.factory_service import LINE_NAME_TO_ID, determine_station_status
 
@@ -27,10 +30,10 @@ def determine_section_status(
 	metric: ShiftMetric | None,
 	downtime_minutes: int,
 	has_equipment: bool = False,
-) -> str:
+) -> LayoutStatus:
 	"""Section status: SLA by metrics when present, by downtime/equipment otherwise."""
 	if metric is not None:
-		defect_pct = metric.defect_percent or 0.0
+		defect_pct = float(metric.defect_percent or 0.0)
 		return determine_station_status(downtime_minutes, defect_pct)
 	if downtime_minutes > 0:
 		return determine_station_status(downtime_minutes, 0.0)
@@ -82,7 +85,7 @@ class FactoryLayoutService:
 					id=line.id,
 					name=line.name,
 					step_order=line.step_order,
-					section_type=line.section_type,
+					section_type=cast(SectionType, line.section_type),
 					status=determine_section_status(
 						metric, section_dt, has_equipment=bool(line.equipment)
 					),
@@ -99,9 +102,11 @@ class FactoryLayoutService:
 			return None
 		return SectionMetrics(
 			fact=metric.fact,
-			plan=metric.plan or 0,
+			plan=metric.plan if metric.plan is not None else 0,
 			load_percent=round(metric.load_percent, 2),
-			defect_percent=round(metric.defect_percent or 0.0, 2),
+			defect_percent=round(
+				metric.defect_percent if metric.defect_percent is not None else 0.0, 2
+			),
 		)
 
 	@staticmethod

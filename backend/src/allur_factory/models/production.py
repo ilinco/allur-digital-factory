@@ -1,10 +1,13 @@
-from sqlalchemy import Column, Date, Float, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
+from datetime import date
 
-from allur_factory.models import Base
+from sqlalchemy import Date, Float, ForeignKey, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-SECTION_TYPE_PROCESS = 'process'
-SECTION_TYPE_WAREHOUSE = 'warehouse'
+from allur_factory.models.base import Base
+from allur_factory.schemas.factory import SectionType
+
+SECTION_TYPE_PROCESS: SectionType = 'process'
+SECTION_TYPE_WAREHOUSE: SectionType = 'warehouse'
 
 
 class ProductionLine(Base):
@@ -12,18 +15,20 @@ class ProductionLine(Base):
 
 	__tablename__ = 'production_lines'
 
-	id = Column(String(50), primary_key=True)  # 'welding-1', 'painting-1', 'assembly-1', 'qc-1'
-	name = Column(String(100), nullable=False)  # 'Сварка-1', 'Окраска-1'
-	step_order = Column(Integer, nullable=False)  # Порядок на конвейере: 1, 2, 3...
-	section_type = Column(
+	id: Mapped[str] = mapped_column(String(50), primary_key=True)
+	name: Mapped[str] = mapped_column(String(100), nullable=False)
+	step_order: Mapped[int] = mapped_column(Integer, nullable=False)
+	section_type: Mapped[str] = mapped_column(
 		String(20),
 		nullable=False,
 		default=SECTION_TYPE_PROCESS,
 		server_default=SECTION_TYPE_PROCESS,
-	)  # 'process' | 'warehouse'
+	)
 
-	shift_metrics = relationship('ShiftMetric', back_populates='line')
-	equipment = relationship('Equipment', back_populates='line', order_by='Equipment.name')
+	shift_metrics: Mapped[list['ShiftMetric']] = relationship('ShiftMetric', back_populates='line')
+	equipment: Mapped[list['Equipment']] = relationship(
+		'Equipment', back_populates='line', order_by='Equipment.name'
+	)
 
 
 class Equipment(Base):
@@ -31,12 +36,14 @@ class Equipment(Base):
 
 	__tablename__ = 'equipment'
 
-	id = Column(Integer, primary_key=True, autoincrement=True)
-	name = Column(String(100), unique=True, nullable=False)  # 'ABB-01', 'Камера-02'
-	line_id = Column(String(50), ForeignKey('production_lines.id'), nullable=False, index=True)
-	equipment_type = Column(String(50), nullable=False)  # 'welding_robot', 'paint_booth', ...
+	id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+	name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+	line_id: Mapped[str] = mapped_column(
+		String(50), ForeignKey('production_lines.id'), nullable=False, index=True
+	)
+	equipment_type: Mapped[str] = mapped_column(String(50), nullable=False)
 
-	line = relationship('ProductionLine', back_populates='equipment')
+	line: Mapped['ProductionLine'] = relationship('ProductionLine', back_populates='equipment')
 
 
 class ShiftMetric(Base):
@@ -44,18 +51,20 @@ class ShiftMetric(Base):
 
 	__tablename__ = 'shift_metrics'
 
-	id = Column(Integer, primary_key=True, autoincrement=True)
-	record_date = Column(Date, nullable=False, index=True)
-	line_id = Column(String(50), ForeignKey('production_lines.id'), nullable=False)
+	id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+	record_date: Mapped[date] = mapped_column(Date, nullable=False, index=True)
+	line_id: Mapped[str] = mapped_column(
+		String(50), ForeignKey('production_lines.id'), nullable=False
+	)
 
-	plan = Column(Integer, default=120)  # План смены
-	fact = Column(Integer, nullable=False)  # Факт выпуска
-	work_hours = Column(Float, nullable=False)  # Отработано часов
-	load_percent = Column(Float, nullable=False)  # Загрузка оборудования, %
-	defects_count = Column(Integer, default=0)  # Количество брака
-	defect_percent = Column(Float, default=0.0)  # % брака (лимит <= 2.0%)
+	plan: Mapped[int | None] = mapped_column(Integer, default=120, nullable=True)
+	fact: Mapped[int] = mapped_column(Integer, nullable=False)
+	work_hours: Mapped[float] = mapped_column(Float, nullable=False)
+	load_percent: Mapped[float] = mapped_column(Float, nullable=False)
+	defects_count: Mapped[int | None] = mapped_column(Integer, default=0, nullable=True)
+	defect_percent: Mapped[float | None] = mapped_column(Float, default=0.0, nullable=True)
 
-	line = relationship('ProductionLine', back_populates='shift_metrics')
+	line: Mapped['ProductionLine'] = relationship('ProductionLine', back_populates='shift_metrics')
 
 
 class Downtime(Base):
@@ -63,15 +72,18 @@ class Downtime(Base):
 
 	__tablename__ = 'downtimes'
 
-	id = Column(Integer, primary_key=True, autoincrement=True)
-	record_date = Column(Date, nullable=False, index=True)
-	section = Column(String(100), nullable=False)  # 'Сварка', 'Окраска', 'Сборка'
-	equipment = Column(String(100), nullable=False)  # 'ABB-01', 'Камера-02', 'Конвейер-03'
-	reason = Column(String(255), nullable=False)  # 'Ошибка датчика', 'Обрыв цепи'
-	duration_minutes = Column(Integer, nullable=False)  # Лимит <= 60 мин/сутки
-	# Нормализованные ссылки на справочники (строковые поля сохранены как исходные данные)
-	line_id = Column(String(50), ForeignKey('production_lines.id'), nullable=True, index=True)
-	equipment_id = Column(Integer, ForeignKey('equipment.id'), nullable=True, index=True)
+	id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+	record_date: Mapped[date] = mapped_column(Date, nullable=False, index=True)
+	section: Mapped[str] = mapped_column(String(100), nullable=False)
+	equipment: Mapped[str] = mapped_column(String(100), nullable=False)
+	reason: Mapped[str] = mapped_column(String(255), nullable=False)
+	duration_minutes: Mapped[int] = mapped_column(Integer, nullable=False)
+	line_id: Mapped[str | None] = mapped_column(
+		String(50), ForeignKey('production_lines.id'), nullable=True, index=True
+	)
+	equipment_id: Mapped[int | None] = mapped_column(
+		Integer, ForeignKey('equipment.id'), nullable=True, index=True
+	)
 
 
 class MonthlyPlan(Base):
@@ -79,9 +91,7 @@ class MonthlyPlan(Base):
 
 	__tablename__ = 'monthly_plans'
 
-	id = Column(Integer, primary_key=True, autoincrement=True)
-	model_name = Column(
-		String(100), unique=True, nullable=False
-	)  # 'Chevrolet Onix', 'Cobalt', 'JAC J7'
-	target_monthly = Column(Integer, nullable=False)  # Месячный таргет (сумма >= 5500)
-	produced_fact = Column(Integer, default=0)  # Текущий факт
+	id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+	model_name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+	target_monthly: Mapped[int] = mapped_column(Integer, nullable=False)
+	produced_fact: Mapped[int | None] = mapped_column(Integer, default=0, nullable=True)

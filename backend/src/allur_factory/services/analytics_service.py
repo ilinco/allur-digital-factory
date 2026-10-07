@@ -1,7 +1,7 @@
 from datetime import date
 
 from allur_factory.repositories.production import ProductionRepository
-from allur_factory.schemas.factory import KpiSummaryResponse
+from allur_factory.schemas.factory import KpiSummaryResponse, ModelProgressItem
 from allur_factory.services.oee_engine import calculate_oee
 
 
@@ -39,26 +39,22 @@ class AnalyticsService:
 		else:
 			overall_oee = 0.0
 
-		models_progress = [
-			{
-				'model_name': plan.model_name,
-				'target_monthly': plan.target_monthly,
-				'produced_fact': plan.produced_fact if plan.produced_fact is not None else 0,
-				'target': plan.target_monthly,
-				'fact': plan.produced_fact if plan.produced_fact is not None else 0,
-				'percent': round(
-					(
-						(plan.produced_fact if plan.produced_fact is not None else 0)
-						/ plan.target_monthly
-					)
-					* 100,
-					2,
+		models_progress: list[ModelProgressItem] = []
+		for plan in monthly_plans:
+			fact = plan.produced_fact if plan.produced_fact is not None else 0
+			percent = (
+				round((fact / plan.target_monthly) * 100, 2) if plan.target_monthly > 0 else 0.0
+			)
+			models_progress.append(
+				ModelProgressItem(
+					model_name=plan.model_name,
+					target_monthly=plan.target_monthly,
+					produced_fact=fact,
+					target=plan.target_monthly,
+					fact=fact,
+					percent=percent,
 				)
-				if plan.target_monthly > 0
-				else 0.0,
-			}
-			for plan in monthly_plans
-		]
+			)
 
 		return KpiSummaryResponse(
 			record_date=resolved_date.isoformat(),
