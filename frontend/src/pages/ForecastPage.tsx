@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { PageContent } from '@/components/layout/PageContent';
-import { Button } from '@/components/ui/Button';
 import { ForecastHeader } from '@/components/ui/forecast/ForecastHeader';
 import { ForecastKpiCardsRow } from '@/components/ui/forecast/ForecastKpiCardsRow';
 import { ForecastOverviewChartCard } from '@/components/ui/forecast/ForecastOverviewChartCard';
@@ -9,6 +8,8 @@ import { ForecastDistributionCard } from '@/components/ui/forecast/ForecastDistr
 import { ForecastBottlenecksTableCard } from '@/components/ui/forecast/ForecastBottlenecksTableCard';
 import { ForecastSimulationModal } from '@/components/ui/forecast/ForecastSimulationModal';
 import { StatusGuideModal } from '@/components/ui/StatusGuideModal';
+import { ErrorCard } from '@/components/ui/error/ErrorCard';
+import { toast } from '@/context/notificationStore';
 import { useForecastData } from '@/hooks/useForecastData';
 
 export const ForecastPage = () => {
@@ -68,17 +69,11 @@ export const ForecastPage = () => {
             </div>
           </div>
         ) : isError ? (
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-xs">
-            <p className="text-base font-semibold text-rose-600">
-              Не удалось загрузить прогноз с сервера завода
-            </p>
-            <p className="mt-1.5 text-sm font-medium text-slate-500">
-              Проверьте соединение с API
-            </p>
-            <Button variant="primary" onClick={refetchAll} className="mt-4">
-              Повторить попытку
-            </Button>
-          </div>
+          <ErrorCard
+            title="Не удалось загрузить прогноз с сервера завода"
+            message="Проверьте соединение с API цифрового двойника Allur и повторите попытку."
+            onRetry={refetchAll}
+          />
         ) : (
           <div className="space-y-4 sm:space-y-5">
             {/* Top KPI Cards Row (3 cards matching screenshot) */}
@@ -127,6 +122,10 @@ export const ForecastPage = () => {
         forecast={forecast}
         onApply={() => {
           setIsSimulationOpen(false);
+          toast.success(
+            `Сценарий для «${targetModel}» применен (+${simulateDowntimeMin} мин простоя)`,
+            { title: 'Предиктивный прогноз' },
+          );
           refetchAll();
         }}
         isApplying={isFetching}

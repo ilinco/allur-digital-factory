@@ -10,7 +10,7 @@ import { SimulationAlertBanner } from '@/components/ui/schema/SimulationAlertBan
 import { SimulationQuickBar } from '@/components/ui/schema/SimulationQuickBar';
 import { StatusGuideModal } from '@/components/ui/StatusGuideModal';
 import { StatusLegendBar } from '@/components/ui/StatusLegendBar';
-import { Button } from '@/components/ui/Button';
+import { ErrorCard } from '@/components/ui/error/ErrorCard';
 import { useFactoryLayoutData } from '@/hooks/useFactoryLayoutData';
 import { useLockedBody } from '@/hooks/useLockedBody';
 
@@ -75,17 +75,11 @@ export const SchemaPage = () => {
             <div className="h-72 rounded-2xl border border-slate-200 bg-white" />
           </div>
         ) : isError ? (
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-xs">
-            <p className="text-base font-semibold text-rose-600">
-              Не удалось загрузить схему производства
-            </p>
-            <p className="mt-1.5 text-sm font-medium text-slate-500">
-              Проверьте соединение с API цифрового двойника
-            </p>
-            <Button variant="primary" onClick={refetchAll} className="mt-4">
-              Повторить попытку
-            </Button>
-          </div>
+          <ErrorCard
+            title="Не удалось загрузить схему производства"
+            message="Проверьте соединение с API цифрового двойника завода Allur и повторите попытку."
+            onRetry={refetchAll}
+          />
         ) : (
           <>
             {/* Top Aggregate KPI row */}

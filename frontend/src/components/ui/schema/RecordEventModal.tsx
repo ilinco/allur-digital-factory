@@ -7,6 +7,7 @@ import type {
 } from '@/types/schema';
 import { Button } from '@/components/ui/Button';
 import { Select } from '@/components/ui/Select';
+import { parseApiError } from '@/api/errorParser';
 
 interface RecordEventModalProps {
   onClose: () => void;
@@ -76,8 +77,8 @@ export const RecordEventModal = ({
         reason: eventType === 'defect' && reason ? reason.trim() : undefined,
       });
       onClose();
-    } catch {
-      setError('Ошибка при отправке события в API');
+    } catch (err) {
+      setError(parseApiError(err).message);
     }
   };
 
@@ -133,11 +134,7 @@ export const RecordEventModal = ({
                 type="button"
                 onClick={() => {
                   setEventType('defect');
-                  setFieldErrors((prev) => {
-                    const next = { ...prev };
-                    delete next.reason;
-                    return next;
-                  });
+                  if (fieldErrors.reason) setFieldErrors((p) => ({ ...p, reason: '' }));
                 }}
                 className={`flex h-9 items-center justify-center rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                   eventType === 'defect'
@@ -151,11 +148,7 @@ export const RecordEventModal = ({
                 type="button"
                 onClick={() => {
                   setEventType('pass');
-                  setFieldErrors((prev) => {
-                    const next = { ...prev };
-                    delete next.reason;
-                    return next;
-                  });
+                  if (fieldErrors.reason) setFieldErrors((p) => ({ ...p, reason: '' }));
                 }}
                 className={`flex h-9 items-center justify-center rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                   eventType === 'pass'

@@ -13,6 +13,7 @@ import type {
   SimulationActionRequest,
   SimulationActionResponse,
 } from '@/types/schema';
+import { toast } from '@/context/notificationStore';
 
 export const useFactoryLayoutData = (selectedDate: string = '2026-10-02') => {
   const queryClient = useQueryClient();
@@ -85,6 +86,16 @@ export const useFactoryLayoutData = (selectedDate: string = '2026-10-02') => {
       if (data.affected_section?.id) {
         setSelectedSectionId(data.affected_section.id);
       }
+      const actionLabels: Record<string, string> = {
+        breakdown: 'Аварийный сбой оборудования',
+        defect_spike: 'Всплеск дефектов кузовов',
+        critical_stop: 'Останов конвейерной линии',
+        reset: 'Сброс симуляции к базовому режиму',
+      };
+      const title = actionLabels[data.action] || 'Сценарий симуляции';
+      toast.success(`Применен сценарий: ${title}`, {
+        title: 'Цифровой двойник Allur',
+      });
       await invalidateAll();
     },
   });
@@ -96,6 +107,10 @@ export const useFactoryLayoutData = (selectedDate: string = '2026-10-02') => {
       if (data.section_id) {
         setSelectedSectionId(data.section_id);
       }
+      toast.success(
+        `Зафиксирован простой: ${data.downtime?.equipment || 'оборудование'} (${data.downtime?.duration_minutes || 0} мин)`,
+        { title: 'Реестр простоев' },
+      );
       await invalidateAll();
     },
   });
@@ -112,6 +127,12 @@ export const useFactoryLayoutData = (selectedDate: string = '2026-10-02') => {
       if (data.section_id) {
         setSelectedSectionId(data.section_id);
       }
+      toast.success(
+        data.event_type === 'defect'
+          ? `Зафиксирован брак (${data.count} шт.) на участке`
+          : `Зафиксировано прохождение деталей (${data.count} шт.)`,
+        { title: 'Контроль производства' },
+      );
       await invalidateAll();
     },
   });

@@ -3,6 +3,7 @@ import { IconX } from '@tabler/icons-react';
 import type { DowntimeCreateRequest, SectionNode } from '@/types/schema';
 import { Button } from '@/components/ui/Button';
 import { Select } from '@/components/ui/Select';
+import { parseApiError } from '@/api/errorParser';
 
 interface RecordDowntimeModalProps {
   onClose: () => void;
@@ -55,10 +56,16 @@ export const RecordDowntimeModal = ({
 
     try {
       setError(null);
-      await onSubmit({ section_id: sectionId, equipment: equipment.trim(), equipment_id: equipmentId, reason: reason.trim(), duration_minutes: parsedDuration });
+      await onSubmit({
+        section_id: sectionId,
+        equipment: equipment.trim(),
+        equipment_id: equipmentId,
+        reason: reason.trim(),
+        duration_minutes: parsedDuration,
+      });
       onClose();
-    } catch {
-      setError('Ошибка при сохранении данных в API');
+    } catch (err) {
+      setError(parseApiError(err).message);
     }
   };
 
@@ -128,11 +135,7 @@ export const RecordDowntimeModal = ({
                     const found = currentSection.equipment.find((eq) => eq.id === idNum);
                     setEquipment(found ? found.name : '');
                     if (fieldErrors.equipment) {
-                      setFieldErrors((prev) => {
-                        const next = { ...prev };
-                        delete next.equipment;
-                        return next;
-                      });
+                      setFieldErrors((prev) => ({ ...prev, equipment: '' }));
                     }
                   }}
                   options={[
@@ -157,13 +160,7 @@ export const RecordDowntimeModal = ({
                   value={equipment}
                   onChange={(e) => {
                     setEquipment(e.target.value);
-                    if (fieldErrors.equipment) {
-                      setFieldErrors((prev) => {
-                        const next = { ...prev };
-                        delete next.equipment;
-                        return next;
-                      });
-                    }
+                    if (fieldErrors.equipment) setFieldErrors((p) => ({ ...p, equipment: '' }));
                   }}
                   placeholder="Например, Конвейерная линия-01"
                   className={`mt-1.5 w-full rounded-xl border bg-white px-3.5 py-2 text-sm text-slate-800 outline-none transition-colors ${
@@ -191,13 +188,7 @@ export const RecordDowntimeModal = ({
               value={reason}
               onChange={(e) => {
                 setReason(e.target.value);
-                if (fieldErrors.reason) {
-                  setFieldErrors((prev) => {
-                    const next = { ...prev };
-                    delete next.reason;
-                    return next;
-                  });
-                }
+                if (fieldErrors.reason) setFieldErrors((p) => ({ ...p, reason: '' }));
               }}
               placeholder="Например: Замена фильтров, сбой позиционирования"
               className={`mt-1.5 w-full rounded-xl border bg-white px-3.5 py-2 text-sm text-slate-800 outline-none transition-colors ${
@@ -218,7 +209,7 @@ export const RecordDowntimeModal = ({
                   type="button"
                   onClick={() => {
                     setReason(preset);
-                    if (fieldErrors.reason) setFieldErrors((p) => { const n = { ...p }; delete n.reason; return n; });
+                    if (fieldErrors.reason) setFieldErrors((p) => ({ ...p, reason: '' }));
                   }}
                   className="cursor-pointer rounded-lg border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
                 >

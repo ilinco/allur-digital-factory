@@ -9,7 +9,7 @@ import { DefectDistributionCard } from '@/components/ui/DefectDistributionCard';
 import { ScheduleAndDowntimesCard } from '@/components/ui/ScheduleAndDowntimesCard';
 import { StationsLoadCard } from '@/components/ui/StationsLoadCard';
 import { StatusGuideModal } from '@/components/ui/StatusGuideModal';
-import { Button } from '@/components/ui/Button';
+import { ErrorCard } from '@/components/ui/error/ErrorCard';
 import { useLockedBody } from '@/hooks/useLockedBody';
 
 export const HomePage = () => {
@@ -55,17 +55,11 @@ export const HomePage = () => {
             </div>
           </div>
         ) : isError ? (
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-xs">
-            <p className="text-base font-semibold text-rose-600">
-              Не удалось загрузить данные с сервера завода
-            </p>
-            <p className="mt-1.5 text-sm font-medium text-slate-500">
-              Проверьте соединение с API
-            </p>
-            <Button variant="primary" onClick={refetchAll} className="mt-4">
-              Повторить попытку
-            </Button>
-          </div>
+          <ErrorCard
+            title="Не удалось загрузить данные с сервера завода"
+            message="Проверьте соединение с API цифрового двойника Allur и повторите попытку."
+            onRetry={refetchAll}
+          />
         ) : (
           <>
             {/* Top KPI Cards Row */}
