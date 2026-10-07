@@ -65,7 +65,7 @@ export const ConveyorPipelineFlow = ({
                 : 'text-slate-500 hover:text-slate-800'
             }`}
           >
-            Все переделы ({sections.length})
+            Все ({sections.length})
           </button>
           <button
             type="button"
@@ -102,7 +102,9 @@ export const ConveyorPipelineFlow = ({
             <select
               aria-label="Сортировка участков конвейера"
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as 'step' | 'downtime' | 'load')}
+              onChange={(e) =>
+                setSortBy(e.target.value as 'step' | 'downtime' | 'load')
+              }
               className="appearance-none rounded-lg border border-slate-200 bg-white py-1.5 pl-3 pr-8 text-xs font-semibold text-slate-700 shadow-2xs hover:border-slate-300 focus:outline-none"
             >
               <option value="step">По порядку конвейера (01-06)</option>

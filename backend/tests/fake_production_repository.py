@@ -209,6 +209,13 @@ class FakeProductionRepository:
 			MonthlyPlan(id=3, model_name='JAC J7', target_monthly=500, produced_fact=260),
 		]
 
+	async def get_monthly_plan_by_model(self, model_name: str) -> MonthlyPlan | None:
+		plans = await self.get_monthly_plans()
+		for p in plans:
+			if p.model_name.strip().lower() == model_name.strip().lower():
+				return p
+		return None
+
 	async def get_latest_record_date(self) -> date | None:
 		return self.latest
 

@@ -100,6 +100,13 @@ class ProductionRepository:
 		result = await self.db.scalars(select(MonthlyPlan).order_by(MonthlyPlan.id))
 		return result.all()
 
+	async def get_monthly_plan_by_model(self, model_name: str) -> MonthlyPlan | None:
+		"""Get monthly production plan for a specific vehicle model (case-insensitive)."""
+		result = await self.db.scalars(
+			select(MonthlyPlan).where(func.lower(MonthlyPlan.model_name) == model_name.strip().lower())
+		)
+		return result.first()
+
 	async def get_latest_record_date(self) -> date | None:
 		"""Get the most recent record date available in shift metrics."""
 		result = await self.db.scalar(select(func.max(ShiftMetric.record_date)))
