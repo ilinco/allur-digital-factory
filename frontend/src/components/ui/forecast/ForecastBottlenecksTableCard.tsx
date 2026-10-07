@@ -149,6 +149,7 @@ export const ForecastBottlenecksTableCard = ({
                             ? 'Внимание'
                             : 'Штатно'
                       }
+                      description={`Узкое место такта: ${item.equipment} (${item.reason}), прогнозные потери: -${item.impact_lost_units} шт.`}
                       pulse={item.risk_level === 'critical'}
                     />
                   </td>

@@ -60,6 +60,15 @@ export const EquipmentCard = ({
                     ? 'В строю'
                     : 'Ожидание'
             }
+            description={
+              equipment.status === 'critical'
+                ? `Аварийный простой агрегата: ${equipment.downtime_min} мин (${equipment.downtimes[0]?.reason || 'останов'})`
+                : equipment.status === 'warning'
+                  ? `Предупреждение по агрегату: простой ${equipment.downtime_min} мин (${equipment.downtimes[0]?.reason || 'техническое обслуживание'})`
+                  : equipment.status === 'normal'
+                    ? 'Агрегат функционирует штатно в рамках такта'
+                    : 'Оборудование в режиме ожидания'
+            }
             size="sm"
             pulse={equipment.status === 'critical'}
           />

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { IconBulb, IconClockPause, IconX } from '@tabler/icons-react';
 import { Button } from '@/components/ui/Button';
 import type { PredictiveForecastResponse } from '@/types/forecast';
@@ -25,6 +26,15 @@ export const ForecastSimulationModal = ({
   onApply,
   isApplying,
 }: ForecastSimulationModalProps) => {
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (

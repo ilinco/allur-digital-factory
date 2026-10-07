@@ -33,7 +33,8 @@ export const SectionEquipmentGrid = ({
             Оборудование: {section.name}
           </h2>
           <p className="text-xs font-medium text-slate-500">
-            Реестр станков и технологических постов (этап 0{section.step_order} конвейера)
+            Реестр станков и технологических постов (этап 0{section.step_order}{' '}
+            конвейера)
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
@@ -51,7 +52,7 @@ export const SectionEquipmentGrid = ({
             onClick={onRecordEvent}
             leftIcon={<IconClipboardCheck size={15} />}
           >
-            Событие ОТК
+            События
           </Button>
         </div>
       </div>

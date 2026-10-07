@@ -8,17 +8,24 @@ import { SchemaKpiCards } from '@/components/ui/schema/SchemaKpiCards';
 import { SectionEquipmentGrid } from '@/components/ui/schema/SectionEquipmentGrid';
 import { SimulationAlertBanner } from '@/components/ui/schema/SimulationAlertBanner';
 import { SimulationQuickBar } from '@/components/ui/schema/SimulationQuickBar';
+import { StatusGuideModal } from '@/components/ui/StatusGuideModal';
+import { StatusLegendBar } from '@/components/ui/StatusLegendBar';
 import { Button } from '@/components/ui/Button';
 import { useFactoryLayoutData } from '@/hooks/useFactoryLayoutData';
+import { useLockedBody } from '@/hooks/useLockedBody';
 
 export const SchemaPage = () => {
   const [selectedDate, setSelectedDate] = useState<string>('2026-10-02');
   const [isDowntimeModalOpen, setIsDowntimeModalOpen] = useState(false);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
+  const isAnyModalOpen = isDowntimeModalOpen || isEventModalOpen || isGuideOpen;
   const [modalEquipment, setModalEquipment] = useState<{
     name?: string;
     id?: number;
   }>({});
+
+  useLockedBody(isAnyModalOpen);
 
   const {
     sections,
@@ -57,6 +64,7 @@ export const SchemaPage = () => {
         isRefreshing={isFetching}
         onOpenDowntimeModal={() => handleOpenDowntimeModal()}
         onOpenEventModal={() => setIsEventModalOpen(true)}
+        onOpenGuide={() => setIsGuideOpen(true)}
       />
 
       <PageContent>
@@ -74,11 +82,7 @@ export const SchemaPage = () => {
             <p className="mt-1.5 text-sm font-medium text-slate-500">
               Проверьте соединение с API цифрового двойника
             </p>
-            <Button
-              variant="primary"
-              onClick={refetchAll}
-              className="mt-4"
-            >
+            <Button variant="primary" onClick={refetchAll} className="mt-4">
               Повторить попытку
             </Button>
           </div>
@@ -101,6 +105,9 @@ export const SchemaPage = () => {
               isSimulating={isSimulating}
               activeAction={simulationResponse?.action ?? null}
             />
+
+            {/* SLA Criteria Legend Bar explaining what each status means */}
+            <StatusLegendBar onOpenGuide={() => setIsGuideOpen(true)} />
 
             {/* Visual Conveyor Pipeline Flow (Stage 1 to N) */}
             <ConveyorPipelineFlow
@@ -144,6 +151,11 @@ export const SchemaPage = () => {
           isSubmitting={isRecordingEvent}
         />
       )}
+
+      <StatusGuideModal
+        isOpen={isGuideOpen}
+        onClose={() => setIsGuideOpen(false)}
+      />
     </>
   );
 };

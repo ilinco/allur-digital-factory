@@ -8,10 +8,12 @@ import { ForecastDailyPaceCard } from '@/components/ui/forecast/ForecastDailyPac
 import { ForecastDistributionCard } from '@/components/ui/forecast/ForecastDistributionCard';
 import { ForecastBottlenecksTableCard } from '@/components/ui/forecast/ForecastBottlenecksTableCard';
 import { ForecastSimulationModal } from '@/components/ui/forecast/ForecastSimulationModal';
+import { StatusGuideModal } from '@/components/ui/StatusGuideModal';
 import { useForecastData } from '@/hooks/useForecastData';
 
 export const ForecastPage = () => {
   const [isSimulationOpen, setIsSimulationOpen] = useState(false);
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
 
   const {
     forecast,
@@ -45,6 +47,7 @@ export const ForecastPage = () => {
         onRefresh={refetchAll}
         isRefreshing={isFetching}
         onOpenSimulation={() => setIsSimulationOpen(true)}
+        onOpenGuide={() => setIsGuideOpen(true)}
       />
 
       <PageContent>
@@ -127,6 +130,11 @@ export const ForecastPage = () => {
           refetchAll();
         }}
         isApplying={isFetching}
+      />
+
+      <StatusGuideModal
+        isOpen={isGuideOpen}
+        onClose={() => setIsGuideOpen(false)}
       />
     </>
   );

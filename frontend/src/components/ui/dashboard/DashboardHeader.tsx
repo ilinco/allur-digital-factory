@@ -1,4 +1,6 @@
+import { IconHelpCircle } from '@tabler/icons-react';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { Button } from '@/components/ui/Button';
 import { DateSelector } from '@/components/ui/DateSelector';
 import { HeaderUpdateBadge } from '@/components/ui/HeaderUpdateBadge';
 
@@ -7,6 +9,7 @@ interface DashboardHeaderProps {
   onSelectDate: (date: string) => void;
   onRefresh: () => void;
   isRefreshing: boolean;
+  onOpenGuide?: () => void;
 }
 
 export const DashboardHeader = ({
@@ -14,6 +17,7 @@ export const DashboardHeader = ({
   onSelectDate,
   onRefresh,
   isRefreshing,
+  onOpenGuide,
 }: DashboardHeaderProps) => {
   const formattedDate =
     selectedDate === '2026-10-02'
@@ -37,6 +41,17 @@ export const DashboardHeader = ({
             onRefresh={onRefresh}
             isRefreshing={isRefreshing}
           />
+
+          {onOpenGuide && (
+            <Button
+              variant="secondary"
+              onClick={onOpenGuide}
+              leftIcon={<IconHelpCircle size={17} />}
+              title="Открыть регламент статусов SLA"
+            >
+              Справка
+            </Button>
+          )}
         </>
       }
     />

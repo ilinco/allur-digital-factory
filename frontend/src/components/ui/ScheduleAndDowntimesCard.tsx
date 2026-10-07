@@ -116,7 +116,10 @@ export const ScheduleAndDowntimesCard = ({
                   </p>
                 </div>
                 <div className="flex flex-col items-end gap-1.5">
-                  <StatusIndicator status={st.status} />
+                  <StatusIndicator
+                    status={st.status}
+                    description={`Участок ${st.name}: простой ${st.downtime_min} мин, загрузка ${st.load_percent}%, брак ${st.defect_percent}%`}
+                  />
                   <span className="text-xs font-medium text-slate-500">
                     Загрузка: {st.load_percent}%
                   </span>
@@ -138,7 +141,10 @@ export const ScheduleAndDowntimesCard = ({
                   </p>
                 </div>
                 <div className="flex flex-col items-end gap-1.5">
-                  <StatusIndicator status={dt.status} />
+                  <StatusIndicator
+                    status={dt.status}
+                    description={`Простой агрегата ${dt.equipment} (${dt.section}): ${dt.reason}, длительность ${dt.durationMinutes} мин`}
+                  />
                   <span className="text-xs font-semibold text-slate-700">
                     {dt.durationMinutes} мин
                   </span>

@@ -237,7 +237,7 @@ export const ConveyorNodeCard = ({
         </div>
 
         {/* Status Indicator (unified without badge) */}
-        <div className="shrink-0 pl-1">
+        <div className="shrink-0 flex flex-col items-end pl-1">
           <StatusIndicator
             status={section.status}
             label={
@@ -249,8 +249,24 @@ export const ConveyorNodeCard = ({
                     ? 'Штатно'
                     : 'Буфер'
             }
+            description={
+              isCritical
+                ? `Критический сбой SLA: суммарный простой ${section.downtime_min} мин (>60 мин) или брак ${section.metrics?.defect_percent || 0}% (>5%)`
+                : isWarning
+                  ? `Внимание по SLA: суммарный простой ${section.downtime_min} мин (>30 мин) или брак ${section.metrics?.defect_percent || 0}% (>2%)`
+                  : section.status === 'normal'
+                    ? `Штатный режим: простой ${section.downtime_min} мин, брак ${section.metrics?.defect_percent || 0}%`
+                    : 'Логистический буферный накопитель'
+            }
             pulse={isCritical}
           />
+          {(isCritical || isWarning) && (
+            <span className="text-[10px] font-medium text-slate-500 mt-0.5">
+              {section.downtime_min > 30
+                ? `${section.downtime_min}м простой`
+                : `брак ${section.metrics?.defect_percent}%`}
+            </span>
+          )}
         </div>
       </div>
     </div>

@@ -1,7 +1,4 @@
-import {
-  IconClipboardCheck,
-  IconClockPause,
-} from '@tabler/icons-react';
+import { IconClipboardCheck, IconClockPause, IconHelpCircle } from '@tabler/icons-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { DateSelector } from '@/components/ui/DateSelector';
@@ -14,6 +11,7 @@ interface SchemaHeaderProps {
   isRefreshing: boolean;
   onOpenDowntimeModal: () => void;
   onOpenEventModal: () => void;
+  onOpenGuide?: () => void;
 }
 
 export const SchemaHeader = ({
@@ -23,6 +21,7 @@ export const SchemaHeader = ({
   isRefreshing,
   onOpenDowntimeModal,
   onOpenEventModal,
+  onOpenGuide,
 }: SchemaHeaderProps) => {
   const formattedDate =
     selectedDate === '2026-10-02'
@@ -47,6 +46,17 @@ export const SchemaHeader = ({
             isRefreshing={isRefreshing}
           />
 
+          {onOpenGuide && (
+            <Button
+              variant="secondary"
+              onClick={onOpenGuide}
+              leftIcon={<IconHelpCircle size={17} />}
+              title="Открыть регламент статусов SLA"
+            >
+              Справка SLA
+            </Button>
+          )}
+
           <Button
             variant="outline"
             onClick={onOpenDowntimeModal}
@@ -60,7 +70,7 @@ export const SchemaHeader = ({
             onClick={onOpenEventModal}
             leftIcon={<IconClipboardCheck size={17} />}
           >
-            Событие ОТК
+            События
           </Button>
         </>
       }

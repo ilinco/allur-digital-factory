@@ -8,10 +8,13 @@ import { ModelsProgressCard } from '@/components/ui/ModelsProgressCard';
 import { DefectDistributionCard } from '@/components/ui/DefectDistributionCard';
 import { ScheduleAndDowntimesCard } from '@/components/ui/ScheduleAndDowntimesCard';
 import { StationsLoadCard } from '@/components/ui/StationsLoadCard';
+import { StatusGuideModal } from '@/components/ui/StatusGuideModal';
 import { Button } from '@/components/ui/Button';
+import { useLockedBody } from '@/hooks/useLockedBody';
 
 export const HomePage = () => {
   const [selectedDate, setSelectedDate] = useState<string>('2026-10-02');
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
   const {
     kpi,
     stations,
@@ -25,6 +28,8 @@ export const HomePage = () => {
     refetchAll,
   } = useDashboardData(selectedDate);
 
+  useLockedBody(isGuideOpen);
+
   return (
     <>
       <DashboardHeader
@@ -32,6 +37,7 @@ export const HomePage = () => {
         onSelectDate={setSelectedDate}
         onRefresh={refetchAll}
         isRefreshing={isFetching}
+        onOpenGuide={() => setIsGuideOpen(true)}
       />
 
       <PageContent>
@@ -54,7 +60,7 @@ export const HomePage = () => {
               Не удалось загрузить данные с сервера завода
             </p>
             <p className="mt-1.5 text-sm font-medium text-slate-500">
-              Проверьте соединение с API (http://localhost:8000)
+              Проверьте соединение с API
             </p>
             <Button variant="primary" onClick={refetchAll} className="mt-4">
               Повторить попытку
@@ -101,6 +107,11 @@ export const HomePage = () => {
           </>
         )}
       </PageContent>
+
+      <StatusGuideModal
+        isOpen={isGuideOpen}
+        onClose={() => setIsGuideOpen(false)}
+      />
     </>
   );
 };

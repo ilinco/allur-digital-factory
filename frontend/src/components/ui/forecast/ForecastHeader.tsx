@@ -1,8 +1,6 @@
-import {
-  IconCalendar,
-  IconRefresh,
-} from '@tabler/icons-react';
+import { IconCalendar, IconHelpCircle, IconRefresh } from '@tabler/icons-react';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { Button } from '@/components/ui/Button';
 import { Select } from '@/components/ui/Select';
 
 interface ForecastHeaderProps {
@@ -13,6 +11,7 @@ interface ForecastHeaderProps {
   onRefresh: () => void;
   isRefreshing: boolean;
   onOpenSimulation: () => void;
+  onOpenGuide?: () => void;
 }
 
 export const ForecastHeader = ({
@@ -22,6 +21,7 @@ export const ForecastHeader = ({
   onChangeHorizon,
   onRefresh,
   isRefreshing,
+  onOpenGuide,
 }: ForecastHeaderProps) => {
   return (
     <PageHeader
@@ -57,6 +57,18 @@ export const ForecastHeader = ({
             aria-label="Горизонт планирования"
             className="w-36"
           />
+
+          {onOpenGuide && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={onOpenGuide}
+              leftIcon={<IconHelpCircle size={15} />}
+              title="Открыть регламент статусов SLA"
+            >
+              Справка
+            </Button>
+          )}
 
           {/* Refresh Action */}
           <button
