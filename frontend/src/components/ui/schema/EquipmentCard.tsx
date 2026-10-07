@@ -50,24 +50,25 @@ export const EquipmentCard = ({
           ? 'В строю'
           : 'Ожидание';
 
+  const STATUS_STYLES: Record<string, string> = {
+    critical: 'text-rose-600 bg-rose-100',
+    warning: 'text-amber-600 bg-amber-100',
+    normal: 'text-emerald-600 bg-emerald-100',
+  };
+
   const statusTextClass =
-    equipment.status === 'critical'
-      ? 'text-rose-500'
-      : equipment.status === 'warning'
-        ? 'text-amber-500'
-        : equipment.status === 'normal'
-          ? 'text-emerald-500'
-          : 'text-slate-400';
+    STATUS_STYLES[equipment.status] ??
+    'text-slate-500 bg-slate-50 border border-slate-200';
 
   return (
     <div className="flex flex-col justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-2xs transition-colors hover:bg-slate-50/50">
       <div>
-        <div className="flex items-center justify-between gap-2">
-          <span className="truncate text-xs font-medium text-slate-400">
+        <div className="flex items-center justify-between gap-2 mb-2">
+          <span className="truncate text-xs font-medium text-slate-500">
             {typeLabel}
           </span>
           <div
-            className={`flex items-center gap-1.5 rounded-xs bg-white px-4 py-1 text-[0.75rem] font-medium ${statusTextClass}`}
+            className={`flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[11px] font-semibold ${statusTextClass}`}
           >
             <span>{statusLabel}</span>
           </div>
@@ -95,9 +96,9 @@ export const EquipmentCard = ({
             {equipment.downtimes.map((dt, idx) => (
               <div
                 key={idx}
-                className="flex items-center justify-between rounded-lg bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-700"
+                className="flex items-center justify-between rounded-lg bg-[#f6f6f6] px-3 py-2 text-xs font-medium text-slate-700"
               >
-                <span className="truncate text-slate-600">{dt.reason}</span>
+                <span className="text-slate-600">{dt.reason}</span>
                 <span className="shrink-0 font-bold text-rose-600">
                   {dt.duration_minutes} мин
                 </span>
@@ -106,7 +107,7 @@ export const EquipmentCard = ({
           </div>
         ) : (
           <div className="mt-3 border-t border-slate-100 pt-2.5 text-xs font-medium text-slate-400">
-            Остановок не зафиксировано (100% готовность)
+            Остановок не зафиксировано
           </div>
         )}
       </div>
@@ -117,7 +118,7 @@ export const EquipmentCard = ({
         </span>
         <Button
           size="sm"
-          variant="outline"
+          variant="primary"
           onClick={() =>
             onRecordDowntimeForEquipment(equipment.name, equipment.id)
           }
