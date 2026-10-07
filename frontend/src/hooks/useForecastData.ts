@@ -66,8 +66,73 @@ export const useForecastData = (initialDate: string = '2026-10-02') => {
   const forecast = forecastQuery.data ?? FALLBACK_FORECAST;
   const kpi = kpiQuery.data;
 
-  // Overview Stacked Chart Data (matching screenshot: Oct, Nov, Dec columns)
+  // Overview Stacked Chart Data reactive to planning horizon
   const overviewData = useMemo<MonthlyForecastOverviewPoint[]>(() => {
+    if (horizon === 'weekly') {
+      return [
+        {
+          month: 'Неделя 1',
+          total: 740,
+          onix: 240,
+          cobalt: 180,
+          jac: 140,
+          jetour: 110,
+          other: 70,
+        },
+        {
+          month: 'Неделя 2',
+          total: 760,
+          onix: 250,
+          cobalt: 190,
+          jac: 145,
+          jetour: 115,
+          other: 60,
+        },
+        {
+          month: 'Неделя 3',
+          total: 780,
+          onix: 260,
+          cobalt: 200,
+          jac: 150,
+          jetour: 110,
+          other: 60,
+        },
+        {
+          month: 'Неделя 4',
+          total: 708,
+          onix: 200,
+          cobalt: 150,
+          jac: 145,
+          jetour: 115,
+          other: 98,
+        },
+      ];
+    }
+
+    if (horizon === 'shift') {
+      return [
+        {
+          month: 'Смена 1 (Дневная)',
+          total: 180,
+          onix: 60,
+          cobalt: 45,
+          jac: 35,
+          jetour: 25,
+          other: 15,
+        },
+        {
+          month: 'Смена 2 (Ночная)',
+          total: 166,
+          onix: 55,
+          cobalt: 42,
+          jac: 33,
+          jetour: 24,
+          other: 12,
+        },
+      ];
+    }
+
+    // Default: monthly
     return [
       {
         month: 'Окт',
@@ -97,7 +162,11 @@ export const useForecastData = (initialDate: string = '2026-10-02') => {
         other: 365,
       },
     ];
-  }, []);
+  }, [horizon]);
+
+  const totalOverviewForecast = useMemo(() => {
+    return overviewData.reduce((sum, item) => sum + item.total, 0);
+  }, [overviewData]);
 
   // Daily Pace Chart Data (matching screenshot: 7 days, active day Tuesday/Peak)
   const dailyPaceData = useMemo<DayForecastPoint[]>(() => {
@@ -166,6 +235,7 @@ export const useForecastData = (initialDate: string = '2026-10-02') => {
     horizon,
     setHorizon,
     overviewData,
+    totalOverviewForecast,
     dailyPaceData,
     distributionData,
     bottlenecks,

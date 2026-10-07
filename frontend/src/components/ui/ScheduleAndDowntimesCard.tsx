@@ -1,8 +1,11 @@
 import type { DowntimeIncident, StationStatus } from '@/types/dashboard';
-import { IconBuildingFactory2, IconClockPause } from '@tabler/icons-react';
+import { IconArrowUpRight, IconBuildingFactory2, IconClockPause } from '@tabler/icons-react';
 import { useState } from 'react';
+import { Link } from 'react-router';
 import { DateStripSelector } from '@/components/ui/DateStripSelector';
 import { CardTabs } from '@/components/ui/CardTabs';
+import { StatusIndicator } from '@/components/ui/StatusIndicator';
+import { StaticLinks } from '@/config/StaticLinks';
 
 interface ScheduleAndDowntimesCardProps {
   selectedDate: string;
@@ -11,62 +14,69 @@ interface ScheduleAndDowntimesCardProps {
   downtimes: DowntimeIncident[];
 }
 
+const DATES = [
+  { label: '30 Сен', value: '2026-09-30' },
+  { label: '1 Окт', value: '2026-10-01' },
+  { label: '2 Окт', value: '2026-10-02' },
+  { label: '3 Окт', value: '2026-10-03' },
+];
+
 export const ScheduleAndDowntimesCard = ({
   selectedDate,
   onSelectDate,
   stations,
   downtimes,
 }: ScheduleAndDowntimesCardProps) => {
-  const [activeTab, setActiveTab] = useState<'stations' | 'downtimes'>(
-    'stations',
-  );
+  const [activeTab, setActiveTab] = useState<'stations' | 'downtimes'>('stations');
 
-  const dates = [
-    { label: '30 Сен', value: '2026-09-30' },
-    { label: '1 Окт', value: '2026-10-01' },
-    { label: '2 Окт', value: '2026-10-02' },
-    { label: '3 Окт', value: '2026-10-03' },
-  ];
+  const currentIndex = DATES.findIndex((d) => d.value === selectedDate);
+  const safeIndex = currentIndex !== -1 ? currentIndex : 2;
 
-  const getStatusBadge = (status: 'normal' | 'warning' | 'critical') => {
-    switch (status) {
-      case 'critical':
-        return (
-          <span className="rounded-md border border-rose-200 bg-rose-50 px-2 py-0.5 text-md font-medium text-rose-700">
-            Критично
-          </span>
-        );
-      case 'warning':
-        return (
-          <span className="rounded-md border border-amber-200 bg-amber-50 px-2 py-0.5 text-md font-medium text-amber-700">
-            Внимание
-          </span>
-        );
-      default:
-        return (
-          <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-md font-medium text-emerald-700">
-            В норме
-          </span>
-        );
+  const handlePrevDate = () => {
+    if (safeIndex > 0) {
+      onSelectDate(DATES[safeIndex - 1].value);
+    }
+  };
+
+  const handleNextDate = () => {
+    if (safeIndex < DATES.length - 1) {
+      onSelectDate(DATES[safeIndex + 1].value);
     }
   };
 
   return (
     <div className="flex h-full flex-col justify-between rounded-2xl border border-slate-200 bg-white shadow-xs">
-      {/* Card Header with bottom border */}
+      {/* Card Header */}
       <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
-        <h2 className="text-base font-semibold text-slate-900">
-          Оперативный статус
-        </h2>
+        <div>
+          <h2 className="text-base font-semibold text-slate-900">
+            Оперативный статус
+          </h2>
+          <p className="mt-0.5 text-xs font-medium text-slate-500">
+            Срез по участкам сборки и журналу простоев
+          </p>
+        </div>
+        <Link
+          to={StaticLinks.schema}
+          className="flex items-center gap-1 text-xs font-semibold text-primary transition-colors hover:underline"
+          title="Открыть интерактивную схему производства"
+        >
+          <span>Мнемосхема</span>
+          <IconArrowUpRight size={14} />
+        </Link>
       </div>
 
       <div className="flex flex-1 flex-col justify-between p-5">
         <div>
-          {/* Date Selector Strip */}
+          {/* Date Selector Strip with active Prev/Next handlers */}
           <DateStripSelector
-            dates={dates}
+            dates={DATES}
             selectedDate={selectedDate}
             onSelectDate={onSelectDate}
+            onPrev={handlePrevDate}
+            onNext={handleNextDate}
+            disabledPrev={safeIndex <= 0}
+            disabledNext={safeIndex >= DATES.length - 1}
           />
 
           {/* Tab switchers */}
@@ -101,14 +111,13 @@ export const ScheduleAndDowntimesCard = ({
               >
                 <div>
                   <p className="font-semibold text-slate-900">{st.name}</p>
-                  <p className="mt-0.5 text-md font-medium text-slate-500">
-                    Факт: {st.fact} / {st.plan} шт. • Простой: {st.downtime_min}{' '}
-                    мин
+                  <p className="mt-0.5 text-xs sm:text-sm font-medium text-slate-500">
+                    Факт: {st.fact} / {st.plan} шт. • Простой: {st.downtime_min} мин
                   </p>
                 </div>
-                <div className="flex flex-col items-end gap-1">
-                  {getStatusBadge(st.status)}
-                  <span className="text-md font-medium text-slate-500">
+                <div className="flex flex-col items-end gap-1.5">
+                  <StatusIndicator status={st.status} />
+                  <span className="text-xs font-medium text-slate-500">
                     Загрузка: {st.load_percent}%
                   </span>
                 </div>
@@ -128,8 +137,8 @@ export const ScheduleAndDowntimesCard = ({
                     Причина: {dt.reason}
                   </p>
                 </div>
-                <div className="flex flex-col items-end gap-1">
-                  {getStatusBadge(dt.status)}
+                <div className="flex flex-col items-end gap-1.5">
+                  <StatusIndicator status={dt.status} />
                   <span className="text-xs font-semibold text-slate-700">
                     {dt.durationMinutes} мин
                   </span>

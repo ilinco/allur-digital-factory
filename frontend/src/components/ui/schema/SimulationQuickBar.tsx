@@ -9,6 +9,7 @@ import type {
   SimulationActionType,
 } from '@/types/schema';
 import { Button } from '@/components/ui/Button';
+import { StatusIndicator } from '../StatusIndicator';
 
 export interface SimulationQuickBarProps {
   onTrigger: (payload: SimulationActionRequest) => Promise<unknown>;
@@ -103,8 +104,23 @@ export const SimulationQuickBar = ({
           </div>
         </div>
 
-        {/* Status indicator & Reset button (no badges, no legends) */}
+        {/* Status indicator & Reset button (no badges, unified StatusIndicator) */}
         <div className="flex flex-wrap items-center gap-4">
+          {activeAction ? (
+            <StatusIndicator
+              status="warning"
+              label={`Тест: ${activeAction}`}
+              size="sm"
+              pulse
+            />
+          ) : (
+            <StatusIndicator
+              status="normal"
+              label="Базовый режим завода"
+              size="sm"
+            />
+          )}
+
           <Button
             size="sm"
             variant="secondary"
@@ -168,9 +184,20 @@ export const SimulationQuickBar = ({
 
               {/* Card Footer: Trigger action */}
               <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-xs font-medium text-slate-400">
-                  {isActive ? 'Имитация запущена' : ''}
-                </span>
+                <div>
+                  {isActive ? (
+                    <StatusIndicator
+                      status="critical"
+                      label="Имитация активна"
+                      size="sm"
+                      pulse
+                    />
+                  ) : (
+                    <span className="text-xs font-medium text-slate-400">
+                      Готов к запуску
+                    </span>
+                  )}
+                </div>
                 <Button
                   size="sm"
                   variant={isActive ? 'outline' : 'primary'}

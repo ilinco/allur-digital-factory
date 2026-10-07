@@ -89,8 +89,8 @@ export const ConveyorPipelineFlow = ({
           >
             <span>Отклонения</span>
             {issuesCount > 0 && (
-              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-100 px-1.5 text-[11px] font-bold text-rose-700">
-                {issuesCount}
+              <span className="text-xs font-bold text-rose-600">
+                ({issuesCount})
               </span>
             )}
           </button>

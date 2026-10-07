@@ -1,6 +1,6 @@
 import { Select } from '@/components/ui/Select';
 import type { HourlyPacePoint } from '@/types/dashboard';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Area,
   AreaChart,
@@ -62,6 +62,64 @@ export const ProductionTrendChart = ({
 }: ProductionTrendChartProps) => {
   const [interval, setInterval] = useState<string>('shift1');
 
+  const { chartData, displayFact, displayPlan } = useMemo(() => {
+    if (interval === 'shift2') {
+      const shift2Plan = Math.round(totalPlan / 2);
+      const shift2Fact = totalFact - Math.round(totalFact * 0.51);
+      const times = ['20:00', '22:00', '00:00', '02:00', '04:00', '06:00', '08:00'];
+      const factors = [0.11, 0.26, 0.44, 0.60, 0.76, 0.89, 1.0];
+      const pts = times.map((t, i) => {
+        const fact = Math.round(shift2Fact * factors[i]);
+        const plan = Math.round(shift2Plan * factors[i]);
+        return {
+          time: t,
+          fact,
+          plan,
+          weldingFact: Math.round(fact * 0.32),
+          paintingFact: Math.round(fact * 0.34),
+          assemblyFact: Math.round(fact * 0.34),
+        };
+      });
+      return { chartData: pts, displayFact: shift2Fact, displayPlan: shift2Plan };
+    }
+
+    if (interval === 'hourly') {
+      const hours = ['08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00'];
+      const hourlyPlan = Math.round(totalPlan / hours.length);
+      const hourlyBase = Math.round(totalFact / hours.length);
+      const variance = [-2, 1, 3, -1, 2, 0, -1];
+      const pts = hours.map((t, i) => {
+        const fact = Math.max(1, hourlyBase + variance[i]);
+        return {
+          time: t,
+          fact,
+          plan: hourlyPlan,
+          weldingFact: Math.round(fact * 0.32),
+          paintingFact: Math.round(fact * 0.34),
+          assemblyFact: Math.round(fact * 0.34),
+        };
+      });
+      return { chartData: pts, displayFact: totalFact, displayPlan: totalPlan };
+    }
+
+    // Default: shift1 (Day shift: 08:00 - 20:00)
+    const shift1Plan = Math.round(totalPlan / 2);
+    const shift1Fact = Math.round(totalFact * 0.51);
+    const pts = data.map((d) => ({
+      ...d,
+      plan: Math.round((d.plan / totalPlan) * shift1Plan),
+      fact: Math.round((d.fact / totalFact) * shift1Fact),
+      weldingFact: Math.round((d.weldingFact / totalFact) * shift1Fact),
+      paintingFact: Math.round((d.paintingFact / totalFact) * shift1Fact),
+      assemblyFact: Math.round((d.assemblyFact / totalFact) * shift1Fact),
+    }));
+    return {
+      chartData: pts.length > 0 ? pts : data,
+      displayFact: shift1Fact,
+      displayPlan: shift1Plan,
+    };
+  }, [interval, data, totalFact, totalPlan]);
+
   return (
     <div className="flex h-full flex-col justify-between rounded-2xl border border-slate-200 bg-white shadow-xs">
       <div className="flex flex-col gap-3 border-b border-slate-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
@@ -73,13 +131,13 @@ export const ProductionTrendChart = ({
             <div className="flex items-center gap-2">
               <span className="h-2.5 w-2.5 rounded-full bg-primary" />
               <span className="font-medium text-slate-700">
-                Факт: {totalFact} шт.
+                Факт: {displayFact} шт.
               </span>
             </div>
             <div className="flex items-center gap-2">
               <span className="h-2.5 w-2.5 rounded-full bg-slate-400" />
               <span className="font-medium text-slate-500">
-                План: {totalPlan} шт.
+                План: {displayPlan} шт.
               </span>
             </div>
           </div>
@@ -107,7 +165,7 @@ export const ProductionTrendChart = ({
         <div className="h-64 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart
-              data={data}
+              data={chartData}
               margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
             >
               <defs>

@@ -1,6 +1,7 @@
 import { IconClockPause, IconCpu } from '@tabler/icons-react';
 import type { EquipmentNode } from '@/types/schema';
 import { Button } from '@/components/ui/Button';
+import { StatusIndicator } from '@/components/ui/StatusIndicator';
 
 interface EquipmentCardProps {
   equipment: EquipmentNode;
@@ -41,25 +42,6 @@ export const EquipmentCard = ({
   const typeLabel =
     EQUIPMENT_TYPE_NAMES[equipment.equipment_type] || equipment.equipment_type;
 
-  const statusLabel =
-    equipment.status === 'critical'
-      ? 'Аварийный простой'
-      : equipment.status === 'warning'
-        ? 'Предупреждение'
-        : equipment.status === 'normal'
-          ? 'В строю'
-          : 'Ожидание';
-
-  const STATUS_STYLES: Record<string, string> = {
-    critical: 'text-rose-600 bg-rose-100',
-    warning: 'text-amber-600 bg-amber-100',
-    normal: 'text-emerald-600 bg-emerald-100',
-  };
-
-  const statusTextClass =
-    STATUS_STYLES[equipment.status] ??
-    'text-slate-500 bg-slate-50 border border-slate-200';
-
   return (
     <div className="flex flex-col justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-2xs transition-colors hover:bg-slate-50/50">
       <div>
@@ -67,11 +49,20 @@ export const EquipmentCard = ({
           <span className="truncate text-xs font-medium text-slate-500">
             {typeLabel}
           </span>
-          <div
-            className={`flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[11px] font-semibold ${statusTextClass}`}
-          >
-            <span>{statusLabel}</span>
-          </div>
+          <StatusIndicator
+            status={equipment.status}
+            label={
+              equipment.status === 'critical'
+                ? 'Критично'
+                : equipment.status === 'warning'
+                  ? 'Внимание'
+                  : equipment.status === 'normal'
+                    ? 'В строю'
+                    : 'Ожидание'
+            }
+            size="sm"
+            pulse={equipment.status === 'critical'}
+          />
         </div>
 
         <div className="my-2.5 flex items-center gap-2.5">

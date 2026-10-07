@@ -13,6 +13,7 @@ import type { MonthlyForecastOverviewPoint } from '@/types/forecast';
 interface ForecastOverviewChartCardProps {
   data: MonthlyForecastOverviewPoint[];
   totalForecast?: number;
+  horizon?: 'monthly' | 'weekly' | 'shift';
 }
 
 const MODEL_SERIES = [
@@ -26,7 +27,15 @@ const MODEL_SERIES = [
 export const ForecastOverviewChartCard = ({
   data,
   totalForecast = 8758,
+  horizon = 'monthly',
 }: ForecastOverviewChartCardProps) => {
+  const horizonSubtitle =
+    horizon === 'weekly'
+      ? 'по неделям'
+      : horizon === 'shift'
+        ? 'по сменам'
+        : 'по месяцам';
+
   return (
     <div className="flex h-full flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
       {/* Top Header */}
@@ -36,7 +45,7 @@ export const ForecastOverviewChartCard = ({
             <IconChartBar size={18} stroke={1.75} />
           </div>
           <h2 className="text-base font-semibold text-slate-900">
-            Обзор прогноза выпуска
+            Обзор прогноза выпуска ({horizonSubtitle})
           </h2>
         </div>
       </div>
@@ -47,21 +56,21 @@ export const ForecastOverviewChartCard = ({
           {totalForecast.toLocaleString('ru-RU')} шт.
         </div>
         <div className="mt-1 flex items-center gap-2">
-          <span className="inline-flex items-center gap-1 rounded-md border border-emerald-200/70 bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">
-            15.8% ↗
+          <span className="text-xs font-semibold text-emerald-600">
+            ↑ 15.8%
           </span>
           <span className="text-xs font-medium text-slate-500">
-            +410 шт. превышение базового плана
+            (+410 шт. превышение базового плана)
           </span>
         </div>
       </div>
 
-      {/* Column Totals Preview (matching screenshot values over bars) */}
-      <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+      {/* Column Totals Preview (dynamic count) */}
+      <div className="mt-4 flex items-center justify-around gap-2 text-center">
         {data.map((item) => (
           <div
             key={item.month}
-            className="text-xs font-semibold text-slate-700"
+            className="flex-1 text-xs font-semibold text-slate-700"
           >
             {item.total.toLocaleString('ru-RU')} шт.
           </div>

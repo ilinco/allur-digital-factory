@@ -11,6 +11,8 @@ export interface DateStripSelectorProps {
   onSelectDate: (value: string) => void;
   onPrev?: () => void;
   onNext?: () => void;
+  disabledPrev?: boolean;
+  disabledNext?: boolean;
   className?: string;
 }
 
@@ -20,6 +22,8 @@ export const DateStripSelector = ({
   onSelectDate,
   onPrev,
   onNext,
+  disabledPrev = false,
+  disabledNext = false,
   className = '',
 }: DateStripSelectorProps) => {
   return (
@@ -29,9 +33,10 @@ export const DateStripSelector = ({
       <button
         type="button"
         onClick={onPrev}
-        title="Назад"
-        aria-label="Назад"
-        className="flex h-full w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-slate-50/70 text-primary shadow-2xs transition-colors hover:bg-slate-50 outline-none focus:outline-none"
+        disabled={disabledPrev || !onPrev}
+        title="Предыдущая смена"
+        aria-label="Предыдущая смена"
+        className="flex h-full w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-slate-50/70 text-primary shadow-2xs transition-colors hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed outline-none focus:outline-none"
       >
         <IconChevronLeft size={16} stroke={2} />
       </button>
@@ -63,9 +68,10 @@ export const DateStripSelector = ({
       <button
         type="button"
         onClick={onNext}
-        title="Вперед"
-        aria-label="Вперед"
-        className="flex h-full w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-slate-50/70 text-primary shadow-2xs transition-colors hover:bg-slate-50 outline-none focus:outline-none"
+        disabled={disabledNext || !onNext}
+        title="Следующая смена"
+        aria-label="Следующая смена"
+        className="flex h-full w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-slate-50/70 text-primary shadow-2xs transition-colors hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed outline-none focus:outline-none"
       >
         <IconChevronRight size={16} stroke={2} />
       </button>

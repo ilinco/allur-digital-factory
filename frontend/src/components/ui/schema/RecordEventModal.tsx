@@ -150,6 +150,24 @@ export const RecordEventModal = ({
                 placeholder="Например: Непровар шва, сорность ЛКП"
                 className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 outline-none transition-colors focus:border-slate-400"
               />
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {[
+                  'Непровар шва',
+                  'Сорность ЛКП',
+                  'Геометрия кузова',
+                  'Задир панели',
+                  'Момент затяжки',
+                ].map((preset) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() => setReason(preset)}
+                    className="cursor-pointer rounded-lg border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+                  >
+                    {preset}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 

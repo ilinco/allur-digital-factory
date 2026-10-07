@@ -1,12 +1,16 @@
 import {
   IconAlertTriangle,
+  IconArrowUpRight,
   IconCpu,
   IconDeviceAnalytics,
   IconPaint,
   IconRobot,
 } from '@tabler/icons-react';
+import { Link } from 'react-router';
 import type { BottleneckItem } from '@/types/forecast';
 import { Button } from '../Button';
+import { StatusIndicator } from '../StatusIndicator';
+import { StaticLinks } from '@/config/StaticLinks';
 
 interface ForecastBottlenecksTableCardProps {
   bottlenecks: BottleneckItem[];
@@ -44,28 +48,6 @@ const getEquipmentStyle = (name: string, level: string) => {
   };
 };
 
-const renderRiskBadge = (level: string) => {
-  if (level === 'critical') {
-    return (
-      <span className="inline-flex items-center rounded-lg border border-rose-200/80 bg-rose-50/70 px-3 py-1 text-xs font-semibold text-rose-600">
-        Критический
-      </span>
-    );
-  }
-  if (level === 'warning') {
-    return (
-      <span className="inline-flex items-center rounded-lg border border-amber-200/80 bg-amber-50/70 px-3 py-1 text-xs font-semibold text-amber-600">
-        Предупреждение
-      </span>
-    );
-  }
-  return (
-    <span className="inline-flex items-center rounded-lg border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-600">
-      Низкий
-    </span>
-  );
-};
-
 export const ForecastBottlenecksTableCard = ({
   bottlenecks,
   onOpenSimulation,
@@ -98,17 +80,20 @@ export const ForecastBottlenecksTableCard = ({
         <table className="w-full text-left text-xs font-medium">
           <thead>
             <tr className="border-b border-slate-100 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-              <th className="py-3.5 pr-4 pl-13 text-left">
+              <th className="py-3.5 pr-4 pl-1 text-left">
                 Оборудование
               </th>
-              <th className="py-3.5 px-6 text-left">
-                Уровень риска
+              <th className="py-3.5 px-4 text-left">
+                Статус
               </th>
-              <th className="py-3.5 px-6 text-left">
+              <th className="py-3.5 px-4 text-left">
                 Нагрузка
               </th>
-              <th className="py-3.5 pr-4 pl-6 text-right">
+              <th className="py-3.5 px-4 text-right">
                 Потери
+              </th>
+              <th className="py-3.5 pr-2 pl-4 text-right">
+                Действие
               </th>
             </tr>
           </thead>
@@ -121,6 +106,13 @@ export const ForecastBottlenecksTableCard = ({
                   : item.risk_level === 'warning'
                     ? 45
                     : 20;
+
+              const statusMapped =
+                item.risk_level === 'critical'
+                  ? 'critical'
+                  : item.risk_level === 'warning'
+                    ? 'warning'
+                    : 'normal';
 
               return (
                 <tr
@@ -146,15 +138,25 @@ export const ForecastBottlenecksTableCard = ({
                     </div>
                   </td>
 
-                  {/* Уровень риска */}
-                  <td className="py-4.5 px-6">
-                    {renderRiskBadge(item.risk_level)}
+                  {/* Статус (без badge) */}
+                  <td className="py-4.5 px-4">
+                    <StatusIndicator
+                      status={statusMapped}
+                      label={
+                        item.risk_level === 'critical'
+                          ? 'Критично'
+                          : item.risk_level === 'warning'
+                            ? 'Внимание'
+                            : 'Штатно'
+                      }
+                      pulse={item.risk_level === 'critical'}
+                    />
                   </td>
 
                   {/* Нагрузка с прогресс-баром и процентом */}
-                  <td className="py-4.5 px-6">
-                    <div className="flex items-center gap-3.5">
-                      <div className="h-2 w-36 sm:w-44 overflow-hidden rounded-full bg-slate-100">
+                  <td className="py-4.5 px-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-2 w-28 sm:w-36 overflow-hidden rounded-full bg-slate-100">
                         <div
                           style={{ width: `${loadPercent}%` }}
                           className={`h-full rounded-full transition-all duration-300 ${
@@ -173,10 +175,22 @@ export const ForecastBottlenecksTableCard = ({
                   </td>
 
                   {/* Потери выпуска */}
-                  <td className="py-4.5 pr-4 pl-6 text-right">
+                  <td className="py-4.5 px-4 text-right">
                     <span className="text-sm font-bold text-rose-600">
                       -{item.impact_lost_units} шт.
                     </span>
+                  </td>
+
+                  {/* Переход к мнемосхеме */}
+                  <td className="py-4.5 pr-2 pl-4 text-right">
+                    <Link
+                      to={StaticLinks.schema}
+                      className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 transition-colors hover:border-slate-300 hover:text-primary"
+                      title="Открыть схему цеха"
+                    >
+                      <span>К схеме</span>
+                      <IconArrowUpRight size={13} />
+                    </Link>
                   </td>
                 </tr>
               );

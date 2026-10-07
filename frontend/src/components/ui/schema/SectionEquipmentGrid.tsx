@@ -27,23 +27,33 @@ export const SectionEquipmentGrid = ({
   return (
     <div className="flex flex-col gap-4">
       {/* Section Actions & Header */}
-      <div className="flex flex-wrap items-center justify-end gap-2.5">
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => onRecordDowntime()}
-          leftIcon={<IconClockPause size={15} />}
-        >
-          Внести простой
-        </Button>
-        <Button
-          size="sm"
-          variant="primary"
-          onClick={onRecordEvent}
-          leftIcon={<IconClipboardCheck size={15} />}
-        >
-          Событие ОТК
-        </Button>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-base sm:text-lg font-bold text-slate-900">
+            Оборудование: {section.name}
+          </h2>
+          <p className="text-xs font-medium text-slate-500">
+            Реестр станков и технологических постов (этап 0{section.step_order} конвейера)
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => onRecordDowntime()}
+            leftIcon={<IconClockPause size={15} />}
+          >
+            Внести простой
+          </Button>
+          <Button
+            size="sm"
+            variant="primary"
+            onClick={onRecordEvent}
+            leftIcon={<IconClipboardCheck size={15} />}
+          >
+            Событие ОТК
+          </Button>
+        </div>
       </div>
 
       {/* Metrics Row (if available) */}

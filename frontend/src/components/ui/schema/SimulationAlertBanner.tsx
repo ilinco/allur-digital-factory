@@ -6,6 +6,7 @@ import {
 } from '@tabler/icons-react';
 import type { SimulationActionResponse } from '@/types/schema';
 import { Button } from '@/components/ui/Button';
+import { StatusIndicator } from '../StatusIndicator';
 
 interface SimulationAlertBannerProps {
   response: SimulationActionResponse;
@@ -49,6 +50,12 @@ export const SimulationAlertBanner = ({
               <h3 className="text-sm font-bold text-slate-900 sm:text-base">
                 {ai_assistant.title}
               </h3>
+              <StatusIndicator
+                status={isCritical ? 'critical' : isWarning ? 'warning' : 'normal'}
+                label={isCritical ? 'Критично' : isWarning ? 'Внимание' : 'Инфо'}
+                size="sm"
+                pulse={isCritical}
+              />
             </div>
 
             <p className="mt-1 text-sm text-slate-600">

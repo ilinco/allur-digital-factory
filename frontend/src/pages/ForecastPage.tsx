@@ -24,6 +24,7 @@ export const ForecastPage = () => {
     horizon,
     setHorizon,
     overviewData,
+    totalOverviewForecast,
     dailyPaceData,
     distributionData,
     bottlenecks,
@@ -86,7 +87,11 @@ export const ForecastPage = () => {
             {/* Middle Row: Overview Stacked Bar Chart (8 cols) + Daily Pace Bar Chart (4 cols) */}
             <div className="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-12">
               <div className="lg:col-span-7 xl:col-span-8">
-                <ForecastOverviewChartCard data={overviewData} />
+                <ForecastOverviewChartCard
+                  data={overviewData}
+                  totalForecast={totalOverviewForecast}
+                  horizon={horizon}
+                />
               </div>
               <div className="lg:col-span-5 xl:col-span-4">
                 <ForecastDailyPaceCard data={dailyPaceData} />

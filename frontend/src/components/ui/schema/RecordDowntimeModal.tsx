@@ -168,12 +168,48 @@ export const RecordDowntimeModal = ({
               placeholder="Например: Замена фильтров, сбой позиционирования"
               className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 outline-none transition-colors focus:border-slate-400"
             />
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {[
+                'Плановое ТО',
+                'Ошибка датчика',
+                'Перегрев сервопривода',
+                'Сбой позиционирования',
+                'Замена расходников',
+              ].map((preset) => (
+                <button
+                  key={preset}
+                  type="button"
+                  onClick={() => setReason(preset)}
+                  className="cursor-pointer rounded-lg border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+                >
+                  {preset}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700">
-              Длительность (минуты)
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-semibold text-slate-700">
+                Длительность (минуты)
+              </label>
+              <div className="flex gap-1">
+                {[15, 30, 45, 60].map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => setDuration(m)}
+                    className={`cursor-pointer rounded-md border px-1.5 py-0.5 text-[11px] font-medium transition-colors ${
+                      duration === m
+                        ? 'border-primary bg-primary/10 text-primary font-semibold'
+                        : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
+                    }`}
+                  >
+                    {m}м
+                  </button>
+                ))}
+              </div>
+            </div>
             <input
               type="number"
               min={1}

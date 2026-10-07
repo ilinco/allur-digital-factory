@@ -20,14 +20,14 @@ export const ForecastKpiCard = ({
   tooltipText,
   subtext,
 }: ForecastKpiCardProps) => {
-  const badgeStyles =
+  const deltaColorClass =
     deltaType === 'positive'
-      ? 'bg-emerald-50 text-emerald-700 border-emerald-200/70'
+      ? 'text-emerald-600'
       : deltaType === 'negative'
-        ? 'bg-rose-50 text-rose-700 border-rose-200/70'
-        : 'bg-slate-50 text-slate-700 border-slate-200';
+        ? 'text-rose-600'
+        : 'text-slate-600';
 
-  const arrow = deltaType === 'positive' ? '↗' : deltaType === 'negative' ? '↘' : '';
+  const arrow = deltaType === 'positive' ? '↑' : deltaType === 'negative' ? '↓' : '';
 
   return (
     <div className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-xs transition-shadow hover:shadow-sm">
@@ -53,10 +53,8 @@ export const ForecastKpiCard = ({
         <span className="text-3xl font-bold tracking-tight text-slate-900">
           {value}
         </span>
-        <span
-          className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs font-semibold ${badgeStyles}`}
-        >
-          {delta} {arrow}
+        <span className={`inline-flex items-center gap-1 text-xs font-semibold ${deltaColorClass}`}>
+          {arrow ? `${arrow} ` : ''}{delta}
         </span>
       </div>
 

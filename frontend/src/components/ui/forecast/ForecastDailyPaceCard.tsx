@@ -33,11 +33,11 @@ export const ForecastDailyPaceCard = ({ data }: ForecastDailyPaceCardProps) => {
           {totalWeekly.toLocaleString('ru-RU')} шт.
         </div>
         <div className="mt-1 flex items-center gap-2">
-          <span className="inline-flex items-center gap-1 rounded-md border border-emerald-200/70 bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">
-            8.3% ↗
+          <span className="text-xs font-semibold text-emerald-600">
+            ↑ 8.3%
           </span>
           <span className="text-xs font-medium text-slate-500">
-            +749 шт. к прошлой неделе
+            (+749 шт. к прошлой неделе)
           </span>
         </div>
       </div>
