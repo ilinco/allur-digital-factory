@@ -16,6 +16,13 @@ class Settings(BaseSettings):
 	CORS_ALLOW_ORIGINS: list[str] = ['http://localhost:5173']
 	DB_ECHO: bool = False
 
+	OPENROUTER_API_KEY: str | None = Field(
+		default=None,
+		validation_alias=AliasChoices('openrouter_api', 'OPENROUTER_API', 'OPENROUTER_API_KEY'),
+	)
+	OPENROUTER_MODEL: str = 'nvidia/nemotron-3-ultra-550b-a55b:free'
+	OPENROUTER_BASE_URL: str = 'https://openrouter.ai/api/v1'
+
 	user: str = Field(
 		default='postgres', validation_alias=AliasChoices('user', 'POSTGRES_USER', 'DB_USER')
 	)

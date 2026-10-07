@@ -1,3 +1,11 @@
+from allur_factory.schemas.analytics import (
+	BottleneckItem,
+	PlanCompletionForecast,
+	PlanRiskStatus,
+	PredictiveForecastRequest,
+	PredictiveForecastResponse,
+	RiskLevel,
+)
 from allur_factory.schemas.downtime import (
 	DowntimeCreateRequest,
 	DowntimeCreateResponse,
@@ -36,6 +44,7 @@ __all__ = [
 	'AffectedSectionInfo',
 	'AiAssistantAlert',
 	'AlertSeverity',
+	'BottleneckItem',
 	'DowntimeCreateRequest',
 	'DowntimeCreateResponse',
 	'DowntimeEvent',
@@ -47,6 +56,11 @@ __all__ = [
 	'ModelProgressItem',
 	'OeeImpact',
 	'PipelineResponse',
+	'PlanCompletionForecast',
+	'PlanRiskStatus',
+	'PredictiveForecastRequest',
+	'PredictiveForecastResponse',
+	'RiskLevel',
 	'SectionEventRequest',
 	'SectionEventResponse',
 	'SectionEventType',

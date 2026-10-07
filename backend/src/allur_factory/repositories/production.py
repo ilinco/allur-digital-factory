@@ -93,12 +93,19 @@ class ProductionRepository:
 		if target_date is not None:
 			stmt = stmt.where(Downtime.record_date == target_date)
 		result = await self.db.execute(stmt)
-		return int(result.rowcount or 0)
+		return int(getattr(result, 'rowcount', 0) or 0)
 
 	async def get_monthly_plans(self) -> Sequence[MonthlyPlan]:
 		"""Get all vehicle model monthly production plans."""
 		result = await self.db.scalars(select(MonthlyPlan).order_by(MonthlyPlan.id))
 		return result.all()
+
+	async def get_monthly_plan_by_model(self, model_name: str) -> MonthlyPlan | None:
+		"""Get monthly production plan for a specific vehicle model (case-insensitive)."""
+		result = await self.db.scalars(
+			select(MonthlyPlan).where(func.lower(MonthlyPlan.model_name) == model_name.strip().lower())
+		)
+		return result.first()
 
 	async def get_latest_record_date(self) -> date | None:
 		"""Get the most recent record date available in shift metrics."""
