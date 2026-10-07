@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { IconX } from '@tabler/icons-react';
 import type { DowntimeCreateRequest, SectionNode } from '@/types/schema';
 import { Button } from '@/components/ui/Button';
+import { Select } from '@/components/ui/Select';
 
 interface RecordDowntimeModalProps {
   onClose: () => void;
@@ -92,36 +93,29 @@ export const RecordDowntimeModal = ({
             </div>
           )}
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-700">
-              Участок производства
-            </label>
-            <select
-              value={sectionId}
-              onChange={(e) => {
-                setSectionId(e.target.value);
-                setEquipment('');
-                setEquipmentId(undefined);
-              }}
-              className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 outline-none transition-colors focus:border-slate-400"
-            >
-              {sections.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name} ({s.id})
-                </option>
-              ))}
-            </select>
-          </div>
+          <Select
+            label="Участок производства"
+            fullWidth
+            value={sectionId}
+            onChange={(val) => {
+              setSectionId(val);
+              setEquipment('');
+              setEquipmentId(undefined);
+            }}
+            options={sections.map((s) => ({
+              value: s.id,
+              label: `${s.name} (${s.id})`,
+            }))}
+          />
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700">
-              Оборудование
-            </label>
             {currentSection && currentSection.equipment.length > 0 ? (
-              <select
-                value={equipmentId ?? ''}
-                onChange={(e) => {
-                  const val = e.target.value;
+              <Select
+                label="Оборудование"
+                fullWidth
+                placeholder="-- Выберите оборудование из реестра --"
+                value={equipmentId !== undefined ? String(equipmentId) : ''}
+                onChange={(val) => {
                   if (!val) {
                     setEquipment('');
                     setEquipmentId(undefined);
@@ -134,23 +128,27 @@ export const RecordDowntimeModal = ({
                   );
                   setEquipment(found ? found.name : '');
                 }}
-                className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 outline-none transition-colors focus:border-slate-400"
-              >
-                <option value="">-- Выберите оборудование из реестра --</option>
-                {currentSection.equipment.map((eq) => (
-                  <option key={eq.id} value={eq.id}>
-                    [ID #{eq.id}] {eq.name} ({eq.equipment_type})
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <input
-                type="text"
-                value={equipment}
-                onChange={(e) => setEquipment(e.target.value)}
-                placeholder="Например, Конвейерная линия-01"
-                className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 outline-none transition-colors focus:border-slate-400"
+                options={[
+                  { value: '', label: '-- Выберите оборудование из реестра --' },
+                  ...currentSection.equipment.map((eq) => ({
+                    value: String(eq.id),
+                    label: `[ID #${eq.id}] ${eq.name} (${eq.equipment_type})`,
+                  })),
+                ]}
               />
+            ) : (
+              <>
+                <label className="block text-xs font-semibold text-slate-700">
+                  Оборудование
+                </label>
+                <input
+                  type="text"
+                  value={equipment}
+                  onChange={(e) => setEquipment(e.target.value)}
+                  placeholder="Например, Конвейерная линия-01"
+                  className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 outline-none transition-colors focus:border-slate-400"
+                />
+              </>
             )}
             {equipmentId && (
               <p className="mt-1 text-xs font-medium text-slate-500">

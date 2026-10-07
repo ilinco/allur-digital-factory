@@ -18,7 +18,6 @@ dependencies = [
 
 [project.scripts]
 allur_factory = "allur_factory.main:main"
-seed = "allur_factory.scripts.seed:cli"
 
 [build-system]
 requires = ["uv_build>=0.12.22,<0.13.0"]

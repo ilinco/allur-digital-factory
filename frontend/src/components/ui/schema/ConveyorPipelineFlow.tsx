@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { IconChevronDown } from '@tabler/icons-react';
+import { Select } from '@/components/ui/Select';
 import type { SectionNode } from '@/types/schema';
 import { ConveyorNodeCard } from './ConveyorNodeCard';
 
@@ -98,23 +98,20 @@ export const ConveyorPipelineFlow = ({
 
         {/* Right: Sort selector dropdown like on the screenshot */}
         <div className="flex items-center gap-3">
-          <div className="relative">
-            <select
-              aria-label="Сортировка участков конвейера"
-              value={sortBy}
-              onChange={(e) =>
-                setSortBy(e.target.value as 'step' | 'downtime' | 'load')
-              }
-              className="appearance-none rounded-lg border border-slate-200 bg-white py-1.5 pl-3 pr-8 text-xs font-semibold text-slate-700 shadow-2xs hover:border-slate-300 focus:outline-none"
-            >
-              <option value="step">По порядку конвейера (01-06)</option>
-              <option value="load">По загрузке линии</option>
-              <option value="downtime">По времени простоя</option>
-            </select>
-            <div className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400">
-              <IconChevronDown size={14} stroke={2} />
-            </div>
-          </div>
+          <Select
+            size="sm"
+            value={sortBy}
+            onChange={(val) =>
+              setSortBy(val as 'step' | 'downtime' | 'load')
+            }
+            options={[
+              { value: 'step', label: 'По порядку конвейера (01-06)' },
+              { value: 'load', label: 'По загрузке линии' },
+              { value: 'downtime', label: 'По времени простоя' },
+            ]}
+            aria-label="Сортировка участков конвейера"
+            className="w-64"
+          />
         </div>
       </div>
 

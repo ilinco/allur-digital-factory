@@ -1,3 +1,4 @@
+import { Select } from '@/components/ui/Select';
 import type { HourlyPacePoint } from '@/types/dashboard';
 import { useState } from 'react';
 import {
@@ -86,15 +87,19 @@ export const ProductionTrendChart = ({
 
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium text-slate-500">Интервал:</span>
-          <select
+          <Select
+            size="sm"
+            variant="subtle"
             value={interval}
-            onChange={(e) => setInterval(e.target.value)}
-            className="cursor-pointer rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-1.5 text-sm font-medium text-slate-700 outline-none focus:border-slate-400"
-          >
-            <option value="shift1">Смена 1 (08:00 - 20:00)</option>
-            <option value="shift2">Смена 2 (20:00 - 08:00)</option>
-            <option value="hourly">Почасовой такт</option>
-          </select>
+            onChange={(val) => setInterval(val)}
+            options={[
+              { value: 'shift1', label: 'Смена 1 (08:00 - 20:00)' },
+              { value: 'shift2', label: 'Смена 2 (20:00 - 08:00)' },
+              { value: 'hourly', label: 'Почасовой такт' },
+            ]}
+            aria-label="Интервал графика"
+            className="w-52"
+          />
         </div>
       </div>
 

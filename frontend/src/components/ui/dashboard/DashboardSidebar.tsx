@@ -6,7 +6,7 @@ import {
 import { StaticLinks } from '@/config/StaticLinks';
 import { useSidebarCollapse } from '@/hooks/useSidebarCollapse';
 import { SidebarToggleButton } from '@/components/ui/SidebarToggleButton';
-import { SidebarNavItem } from './SidebarNavItem';
+import { SidebarNavItem } from '../SidebarNavItem';
 
 export const DashboardSidebar = () => {
   const { isCollapsed, toggle } = useSidebarCollapse();

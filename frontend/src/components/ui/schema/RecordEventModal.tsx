@@ -6,6 +6,7 @@ import type {
   SectionNode,
 } from '@/types/schema';
 import { Button } from '@/components/ui/Button';
+import { Select } from '@/components/ui/Select';
 
 interface RecordEventModalProps {
   onClose: () => void;
@@ -112,22 +113,16 @@ export const RecordEventModal = ({
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-700">
-              Участок
-            </label>
-            <select
-              value={sectionId}
-              onChange={(e) => setSectionId(e.target.value)}
-              className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 outline-none transition-colors focus:border-slate-400"
-            >
-              {sections.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name} ({s.id})
-                </option>
-              ))}
-            </select>
-          </div>
+          <Select
+            label="Участок"
+            fullWidth
+            value={sectionId}
+            onChange={(val) => setSectionId(val)}
+            options={sections.map((s) => ({
+              value: s.id,
+              label: `${s.name} (${s.id})`,
+            }))}
+          />
 
           <div>
             <label className="block text-xs font-semibold text-slate-700">

@@ -55,7 +55,7 @@ class TestDowntimesEndpoint(unittest.IsolatedAsyncioTestCase):
 	# --- 201 Created: Success Scenarios ---
 
 	async def test_create_downtime_exceeding_60_min_sets_critical_status(self):
-		# welding-1 already has 30 min downtime in seed. Adding 35 min makes 65 min (>60 min limit -> critical)
+		# welding-1 already has 30 min downtime in . Adding 35 min makes 65 min (>60 min limit -> critical)
 		payload = {
 			'section_id': 'welding-1',
 			'equipment': 'ABB-04',
