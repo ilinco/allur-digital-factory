@@ -1,5 +1,4 @@
 import type { StationStatus } from '@/types/dashboard';
-import { IconDotsVertical } from '@tabler/icons-react';
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 
 interface DefectDistributionCardProps {
@@ -31,91 +30,85 @@ export const DefectDistributionCard = ({
         <h2 className="text-base font-semibold text-slate-900">
           Распределение дефектов
         </h2>
-        <button
-          type="button"
-          className="cursor-pointer rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-          title="Параметры"
-        >
-          <IconDotsVertical size={18} stroke={1.75} />
-        </button>
       </div>
 
       <div className="flex flex-1 flex-col justify-between p-5">
+        {/* Donut Chart with center label */}
+        <div className="relative my-3 flex h-48 items-center justify-center">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={chartData}
+                innerRadius={55}
+                outerRadius={75}
+                paddingAngle={4}
+                dataKey="value"
+              >
+                {chartData.map((_, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
+                ))}
+              </Pie>
+              <Tooltip
+                formatter={(value, name) => [`${value} шт.`, `${name}`]}
+                contentStyle={{
+                  backgroundColor: '#ffffff',
+                  borderRadius: '12px',
+                  borderColor: '#e2e8f0',
+                  fontSize: '13px',
+                  fontWeight: 500,
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
 
-      {/* Donut Chart with center label */}
-      <div className="relative my-3 flex h-48 items-center justify-center">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={chartData}
-              innerRadius={55}
-              outerRadius={75}
-              paddingAngle={4}
-              dataKey="value"
-            >
-              {chartData.map((_, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
-                />
-              ))}
-            </Pie>
-            <Tooltip
-              formatter={(value, name) => [`${value} шт.`, `${name}`]}
-              contentStyle={{
-                backgroundColor: '#ffffff',
-                borderRadius: '12px',
-                borderColor: '#e2e8f0',
-                fontSize: '13px',
-                fontWeight: 500,
-              }}
-            />
-          </PieChart>
-        </ResponsiveContainer>
+          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
+            <span className="text-2xl font-bold tracking-tight text-slate-900">
+              {totalDefects} шт.
+            </span>
+            <span className="text-xs font-medium text-slate-500">
+              Всего брак
+            </span>
+          </div>
+        </div>
 
-        <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
-          <span className="text-2xl font-bold tracking-tight text-slate-900">
-            {totalDefects} шт.
-          </span>
-          <span className="text-xs font-medium text-slate-500">Всего брак</span>
+        <div className="space-y-2.5 border-t border-slate-100 pt-3.5 text-sm font-medium">
+          {stations.map((st, idx) => {
+            const defects = Math.round((st.fact * st.defect_percent) / 100);
+            const share =
+              totalDefects > 0
+                ? ((defects / totalDefects) * 100).toFixed(0)
+                : '0';
+
+            return (
+              <div
+                key={st.id}
+                className="flex items-center justify-between text-slate-700"
+              >
+                <div className="flex items-center gap-2.5">
+                  <span
+                    className="h-2.5 w-2.5 rounded-full"
+                    style={{
+                      backgroundColor: COLORS[idx % COLORS.length],
+                    }}
+                  />
+                  <span className="font-medium text-slate-800">{st.name}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-slate-900">
+                    {defects} шт. ({st.defect_percent}%)
+                  </span>
+                  <span className="text-xs font-medium text-slate-400">
+                    [{share}%]
+                  </span>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
-
-      <div className="space-y-2.5 border-t border-slate-100 pt-3.5 text-sm font-medium">
-        {stations.map((st, idx) => {
-          const defects = Math.round((st.fact * st.defect_percent) / 100);
-          const share =
-            totalDefects > 0
-              ? ((defects / totalDefects) * 100).toFixed(0)
-              : '0';
-
-          return (
-            <div
-              key={st.id}
-              className="flex items-center justify-between text-slate-700"
-            >
-              <div className="flex items-center gap-2.5">
-                <span
-                  className="h-2.5 w-2.5 rounded-full"
-                  style={{
-                    backgroundColor: COLORS[idx % COLORS.length],
-                  }}
-                />
-                <span className="font-medium text-slate-800">{st.name}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="font-semibold text-slate-900">
-                  {defects} шт. ({st.defect_percent}%)
-                </span>
-                <span className="text-xs font-medium text-slate-400">
-                  [{share}%]
-                </span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
     </div>
-  </div>
   );
 };

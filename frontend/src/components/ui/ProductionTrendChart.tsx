@@ -34,7 +34,7 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
       <div className="font-semibold text-slate-900">Время: {current.time}</div>
       <div className="mt-1.5 flex items-center justify-between gap-4 text-slate-600">
         <span className="flex items-center gap-1.5 font-medium">
-          <span className="h-2 w-2 rounded-full bg-[#ff2e1f]" />
+          <span className="h-2 w-2 rounded-full bg-primary" />
           Факт:
         </span>
         <span className="font-bold text-slate-900">{current.fact} шт.</span>
@@ -70,7 +70,7 @@ export const ProductionTrendChart = ({
           </h2>
           <div className="mt-1 flex flex-wrap items-center gap-4 text-sm font-medium">
             <div className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-[#ff2e1f]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-primary" />
               <span className="font-medium text-slate-700">
                 Факт: {totalFact} шт.
               </span>
@@ -100,60 +100,60 @@ export const ProductionTrendChart = ({
 
       <div className="flex flex-1 flex-col justify-between p-5">
         <div className="h-64 w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart
-            data={data}
-            margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-          >
-            <defs>
-              <linearGradient id="factGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#ff2e1f" stopOpacity={0.2} />
-                <stop offset="95%" stopColor="#ff2e1f" stopOpacity={0.0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid
-              strokeDasharray="3 3"
-              vertical={false}
-              stroke="#f1f5f9"
-            />
-            <XAxis
-              dataKey="time"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: '#64748b', fontSize: 13, fontWeight: 500 }}
-            />
-            <YAxis
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: '#64748b', fontSize: 13, fontWeight: 500 }}
-              domain={[0, 'auto']}
-            />
-            <Tooltip content={<CustomTooltip />} />
-            <Area
-              type="monotone"
-              dataKey="plan"
-              stroke="#cbd5e1"
-              strokeWidth={1.5}
-              strokeDasharray="4 4"
-              fill="transparent"
-            />
-            <Area
-              type="monotone"
-              dataKey="fact"
-              stroke="#ff2e1f"
-              strokeWidth={2.5}
-              fill="url(#factGradient)"
-              activeDot={{
-                r: 6,
-                fill: '#ff2e1f',
-                stroke: '#ffffff',
-                strokeWidth: 2,
-              }}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart
+              data={data}
+              margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+            >
+              <defs>
+                <linearGradient id="factGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#ff2e1f" stopOpacity={0.2} />
+                  <stop offset="95%" stopColor="#ff2e1f" stopOpacity={0.0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke="#f1f5f9"
+              />
+              <XAxis
+                dataKey="time"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: '#64748b', fontSize: 13, fontWeight: 500 }}
+              />
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: '#64748b', fontSize: 13, fontWeight: 500 }}
+                domain={[0, 'auto']}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Area
+                type="monotone"
+                dataKey="plan"
+                stroke="#cbd5e1"
+                strokeWidth={1.5}
+                strokeDasharray="4 4"
+                fill="transparent"
+              />
+              <Area
+                type="monotone"
+                dataKey="fact"
+                stroke="#ff2e1f"
+                strokeWidth={2.5}
+                fill="url(#factGradient)"
+                activeDot={{
+                  r: 6,
+                  fill: '#ff2e1f',
+                  stroke: '#ffffff',
+                  strokeWidth: 2,
+                }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
-  </div>
   );
 };

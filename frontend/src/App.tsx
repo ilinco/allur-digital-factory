@@ -1,10 +1,11 @@
 import { Outlet } from "react-router";
+import { DashboardLayout } from "@/components/ui/DashboardLayout";
 
 function App() {
   return (
-    <div className="min-h-dvh bg-[#f6f6f6] text-slate-900">
+    <DashboardLayout>
       <Outlet />
-    </div>
+    </DashboardLayout>
   );
 }
 

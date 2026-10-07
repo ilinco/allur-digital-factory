@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { DashboardHeader } from "@/components/ui/DashboardHeader";
-import { DashboardLayout } from "@/components/ui/DashboardLayout";
+import { PageContent } from "@/components/layout/PageContent";
 import { KpiCardsRow } from "@/components/ui/KpiCardsRow";
 import { ProductionTrendChart } from "@/components/ui/ProductionTrendChart";
 import { ModelsProgressCard } from "@/components/ui/ModelsProgressCard";
@@ -25,7 +25,7 @@ export const HomePage = () => {
   } = useDashboardData(selectedDate);
 
   return (
-    <DashboardLayout>
+    <>
       <DashboardHeader
         selectedDate={selectedDate}
         onSelectDate={setSelectedDate}
@@ -33,8 +33,7 @@ export const HomePage = () => {
         isRefreshing={isFetching}
       />
 
-      <main className="flex-1 px-4 pb-4 sm:px-6 sm:pb-6">
-        <div className="flex w-full flex-col gap-4 sm:gap-5">
+      <PageContent>
           {isLoading ? (
             <div className="space-y-4 animate-pulse">
               <div className="h-28 rounded-2xl border border-slate-200 bg-white" />
@@ -104,8 +103,7 @@ export const HomePage = () => {
               </div>
             </>
           )}
-        </div>
-      </main>
-    </DashboardLayout>
+      </PageContent>
+    </>
   );
 };

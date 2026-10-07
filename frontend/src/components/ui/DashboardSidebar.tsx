@@ -1,9 +1,11 @@
 import {
   IconArrowBarLeft,
   IconArrowBarRight,
+  IconDeviceAnalytics,
+  IconFileAi,
   IconHeadset,
+  IconSchema,
   IconSettings,
-  IconSmartHome,
 } from '@tabler/icons-react';
 import { StaticLinks } from '@/config/StaticLinks';
 import { useSidebarCollapse } from '@/hooks/useSidebarCollapse';
@@ -50,8 +52,22 @@ export const DashboardSidebar = () => {
         <nav className="flex flex-col gap-2">
           <SidebarNavItem
             to={StaticLinks.home}
-            icon={<IconSmartHome size={20} stroke={1.8} />}
-            label="Главная"
+            icon={<IconDeviceAnalytics size={20} stroke={1.8} />}
+            label="Аналитика"
+            isCollapsed={isCollapsed}
+          />
+
+          <SidebarNavItem
+            to={StaticLinks.schema}
+            icon={<IconSchema size={20} stroke={1.8} />}
+            label="Схема производства"
+            isCollapsed={isCollapsed}
+          />
+
+          <SidebarNavItem
+            to={StaticLinks.forecast}
+            icon={<IconFileAi size={20} stroke={1.8} />}
+            label="AI-Прогноз"
             isCollapsed={isCollapsed}
           />
         </nav>

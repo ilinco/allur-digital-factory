@@ -1,4 +1,5 @@
 import { IconCalendar, IconRefresh } from '@tabler/icons-react';
+import { PageHeader } from '@/components/layout/PageHeader';
 
 interface DashboardHeaderProps {
   selectedDate: string;
@@ -21,14 +22,10 @@ export const DashboardHeader = ({
         : selectedDate;
 
   return (
-    <header className="flex flex-col gap-3.5 px-4 pt-4 pb-2 sm:px-6 sm:pt-6 sm:pb-3 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900">
-          Аналитика производства
-        </h1>
-      </div>
-
-      <div className="flex flex-wrap items-center gap-3">
+    <PageHeader
+      title="Аналитика производства"
+      actions={
+        <>
         <div className="flex items-center rounded-xl border border-neutral-200/90 bg-white p-1 text-sm font-medium text-slate-600 shadow-2xs">
           <button
             type="button"
@@ -69,7 +66,8 @@ export const DashboardHeader = ({
             />
           </button>
         </div>
-      </div>
-    </header>
+        </>
+      }
+    />
   );
 };

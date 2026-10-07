@@ -4,7 +4,6 @@ import {
   IconChevronLeft,
   IconChevronRight,
   IconClockPause,
-  IconDotsVertical,
 } from '@tabler/icons-react';
 import { useState } from 'react';
 
@@ -62,13 +61,6 @@ export const ScheduleAndDowntimesCard = ({
         <h2 className="text-base font-semibold text-slate-900">
           Оперативный статус
         </h2>
-        <button
-          type="button"
-          className="cursor-pointer rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-          title="Параметры"
-        >
-          <IconDotsVertical size={18} stroke={1.75} />
-        </button>
       </div>
 
       <div className="flex flex-1 flex-col justify-between p-5">
@@ -77,7 +69,7 @@ export const ScheduleAndDowntimesCard = ({
           <div className="flex items-center gap-2">
             <button
               type="button"
-              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-[#ff2e1f] shadow-2xs transition-colors hover:bg-slate-50"
+              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-primary shadow-2xs transition-colors hover:bg-slate-50"
               title="Назад"
             >
               <IconChevronLeft size={16} stroke={2} />
@@ -90,7 +82,7 @@ export const ScheduleAndDowntimesCard = ({
                   onClick={() => onSelectDate(d.value)}
                   className={`cursor-pointer rounded-lg px-2.5 py-1 transition-colors ${
                     selectedDate === d.value
-                      ? 'bg-white font-semibold text-[#ff2e1f] shadow-xs'
+                      ? 'bg-white font-semibold text-primary shadow-xs'
                       : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
@@ -100,7 +92,7 @@ export const ScheduleAndDowntimesCard = ({
             </div>
             <button
               type="button"
-              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-[#ff2e1f] shadow-2xs transition-colors hover:bg-slate-50"
+              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-primary shadow-2xs transition-colors hover:bg-slate-50"
               title="Вперед"
             >
               <IconChevronRight size={16} stroke={2} />
@@ -114,7 +106,7 @@ export const ScheduleAndDowntimesCard = ({
               onClick={() => setActiveTab('stations')}
               className={`flex flex-1 cursor-pointer items-center justify-center gap-2 pb-2.5 transition-colors ${
                 activeTab === 'stations'
-                  ? 'border-b-2 border-[#ff2e1f] font-semibold text-[#ff2e1f]'
+                  ? 'border-b-2 border-primary font-semibold text-primary'
                   : 'hover:text-slate-700'
               }`}
             >
@@ -126,7 +118,7 @@ export const ScheduleAndDowntimesCard = ({
               onClick={() => setActiveTab('downtimes')}
               className={`flex flex-1 cursor-pointer items-center justify-center gap-2 pb-2.5 transition-colors ${
                 activeTab === 'downtimes'
-                  ? 'border-b-2 border-[#ff2e1f] font-semibold text-[#ff2e1f]'
+                  ? 'border-b-2 border-primary font-semibold text-primary'
                   : 'hover:text-slate-700'
               }`}
             >

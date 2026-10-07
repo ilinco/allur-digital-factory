@@ -1,5 +1,4 @@
 import type { StationStatus } from '@/types/dashboard';
-import { IconDotsVertical } from '@tabler/icons-react';
 
 interface StationsLoadCardProps {
   stations: StationStatus[];
@@ -22,13 +21,6 @@ export const StationsLoadCard = ({ stations }: StationsLoadCardProps) => {
             Коэффициент загрузки мощностей по сборочным линиям
           </p>
         </div>
-        <button
-          type="button"
-          className="cursor-pointer rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-          title="Параметры"
-        >
-          <IconDotsVertical size={18} stroke={1.75} />
-        </button>
       </div>
 
       <div className="flex flex-1 flex-col justify-between p-5">
@@ -45,7 +37,7 @@ export const StationsLoadCard = ({ stations }: StationsLoadCardProps) => {
               <div className="h-3 w-full overflow-hidden rounded-full bg-slate-100">
                 <div
                   style={{ width: `${Math.min(100, st.load_percent)}%` }}
-                  className="h-full rounded-full bg-[#ff2e1f] transition-all duration-300"
+                  className="h-full rounded-full bg-primary transition-all duration-300"
                 />
               </div>
 
