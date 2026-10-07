@@ -12,7 +12,7 @@ from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from allur_factory.core.database import AsyncSessionLocal
-from allur_factory.models import Downtime, MonthlyPlan, ProductionLine, ShiftMetric
+from allur_factory.models import Downtime, Equipment, MonthlyPlan, ProductionLine, ShiftMetric
 
 logging.basicConfig(
 	level=logging.INFO,
@@ -32,13 +32,125 @@ LINE_NAME_TO_ID: dict[str, str] = {
 	'контроль качества-1': 'qc-1',
 	'qc': 'qc-1',
 	'qc-1': 'qc-1',
+	'склад комплектующих': 'warehouse-in',
+	'склад готовой продукции': 'warehouse-out',
 }
 
 DEFAULT_PRODUCTION_LINES: list[dict[str, Any]] = [
-	{'id': 'welding-1', 'name': 'Сварка-1', 'step_order': 1},
-	{'id': 'painting-1', 'name': 'Окраска-1', 'step_order': 2},
-	{'id': 'assembly-1', 'name': 'Сборка-1', 'step_order': 3},
-	{'id': 'qc-1', 'name': 'Контроль качества', 'step_order': 4},
+	{
+		'id': 'warehouse-in',
+		'name': 'Склад комплектующих',
+		'step_order': 1,
+		'section_type': 'warehouse',
+	},
+	{'id': 'welding-1', 'name': 'Сварка-1', 'step_order': 2, 'section_type': 'process'},
+	{'id': 'painting-1', 'name': 'Окраска-1', 'step_order': 3, 'section_type': 'process'},
+	{'id': 'assembly-1', 'name': 'Сборка-1', 'step_order': 4, 'section_type': 'process'},
+	{'id': 'qc-1', 'name': 'Контроль качества', 'step_order': 5, 'section_type': 'process'},
+	{
+		'id': 'warehouse-out',
+		'name': 'Склад готовой продукции',
+		'step_order': 6,
+		'section_type': 'warehouse',
+	},
+]
+
+DEFAULT_EQUIPMENT: list[dict[str, Any]] = [
+	# 1. Склад комплектующих
+	{
+		'name': 'Ричтрак Jungheinrich ETV-216',
+		'line_id': 'warehouse-in',
+		'equipment_type': 'reach_truck',
+	},
+	{'name': 'Транспортировщик AGV-01', 'line_id': 'warehouse-in', 'equipment_type': 'agv_tugger'},
+	{
+		'name': 'Конвейер приемки паллет',
+		'line_id': 'warehouse-in',
+		'equipment_type': 'pallet_conveyor',
+	},
+	{
+		'name': 'RFID-портал учета деталей',
+		'line_id': 'warehouse-in',
+		'equipment_type': 'rfid_scanner',
+	},
+	# 2. Сварка
+	{'name': 'ABB-01', 'line_id': 'welding-1', 'equipment_type': 'welding_robot'},
+	{'name': 'ABB-04', 'line_id': 'welding-1', 'equipment_type': 'welding_robot'},
+	{'name': 'KUKA Quantec KR-210', 'line_id': 'welding-1', 'equipment_type': 'welding_robot'},
+	{
+		'name': 'Сварочный кондуктор Geo-Jig',
+		'line_id': 'welding-1',
+		'equipment_type': 'welding_jig',
+	},
+	# 3. Окраска
+	{'name': 'Камера-02', 'line_id': 'painting-1', 'equipment_type': 'paint_booth'},
+	{
+		'name': 'Робот окраски Dürr EcoRP',
+		'line_id': 'painting-1',
+		'equipment_type': 'painting_robot',
+	},
+	{'name': 'Сушильная камера печи', 'line_id': 'painting-1', 'equipment_type': 'drying_oven'},
+	{
+		'name': 'Ванна катафореза KTL',
+		'line_id': 'painting-1',
+		'equipment_type': 'cataphoretic_bath',
+	},
+	# 4. Сборка
+	{'name': 'Конвейер-03', 'line_id': 'assembly-1', 'equipment_type': 'conveyor'},
+	{
+		'name': 'Станция стыковки «Свадьба»',
+		'line_id': 'assembly-1',
+		'equipment_type': 'marriage_station',
+	},
+	{
+		'name': 'Манипулятор остекления Dalmec',
+		'line_id': 'assembly-1',
+		'equipment_type': 'assembly_manipulator',
+	},
+	{
+		'name': 'Винтовертный комплекс Atlas Copco',
+		'line_id': 'assembly-1',
+		'equipment_type': 'torquing_system',
+	},
+	# 5. Контроль качества
+	{
+		'name': 'Световой тоннель аудита ЛКП',
+		'line_id': 'qc-1',
+		'equipment_type': 'inspection_light_tunnel',
+	},
+	{'name': 'КИМ Hexagon Global CMM', 'line_id': 'qc-1', 'equipment_type': 'cmm_scanner'},
+	{'name': 'Тормозной стенд Maha IW4', 'line_id': 'qc-1', 'equipment_type': 'brake_test_bench'},
+	{
+		'name': 'Камера дождевания Shower Test',
+		'line_id': 'qc-1',
+		'equipment_type': 'water_leak_test_booth',
+	},
+	{
+		'name': 'Стенд регулировки фар и ADAS',
+		'line_id': 'qc-1',
+		'equipment_type': 'adas_calibration_bench',
+	},
+	# 6. Склад готовой продукции
+	{
+		'name': 'Пост финишного контроля PDI',
+		'line_id': 'warehouse-out',
+		'equipment_type': 'pdi_station',
+	},
+	{
+		'name': 'Скан-портал VIN-кодов',
+		'line_id': 'warehouse-out',
+		'equipment_type': 'vin_dispatch_gate',
+	},
+	{
+		'name': 'Электротягач перемещения авто',
+		'line_id': 'warehouse-out',
+		'equipment_type': 'vehicle_mover',
+	},
+	{
+		'name': 'Рампа погрузки на автовозы',
+		'line_id': 'warehouse-out',
+		'equipment_type': 'loading_dock',
+	},
 ]
 
 # Fallback dataset from 케йс_Цифровой_двойник_Тестовые_данные.docx
@@ -340,16 +452,31 @@ async def seed_database(
 		await session.execute(delete(ShiftMetric))
 		await session.execute(delete(Downtime))
 		await session.execute(delete(MonthlyPlan))
+		await session.execute(delete(Equipment))
 		await session.execute(delete(ProductionLine))
 		await session.flush()
 
-	# 1. Insert Production Lines
+	# 1. Upsert Production Lines (layout order and section type are kept in sync)
 	logger.info('Seeding production lines...')
 	for line in DEFAULT_PRODUCTION_LINES:
 		existing = await session.get(ProductionLine, line['id'])
-		if not existing:
+		if existing:
+			existing.step_order = line['step_order']
+			existing.section_type = line['section_type']
+		else:
 			session.add(ProductionLine(**line))
 	await session.flush()
+
+	# 1.1 Insert Equipment registry
+	logger.info('Seeding equipment...')
+	equipment_ids: dict[str, int] = {}
+	for item in DEFAULT_EQUIPMENT:
+		eq = await session.scalar(select(Equipment).where(Equipment.name == item['name']))
+		if eq is None:
+			eq = Equipment(**item)
+			session.add(eq)
+			await session.flush()
+		equipment_ids[eq.name] = eq.id
 
 	# 2. Insert Shift Metrics
 	logger.info('Seeding shift metrics...')
@@ -357,10 +484,12 @@ async def seed_database(
 		session.add(ShiftMetric(**metric))
 	await session.flush()
 
-	# 3. Insert Downtimes
+	# 3. Insert Downtimes (raw strings + normalized FK links)
 	logger.info('Seeding downtimes...')
 	for dt in downtimes_data:
-		session.add(Downtime(**dt))
+		line_id = LINE_NAME_TO_ID.get(dt['section'].strip().lower())
+		equipment_id = equipment_ids.get(dt['equipment'].strip())
+		session.add(Downtime(**dt, line_id=line_id, equipment_id=equipment_id))
 	await session.flush()
 
 	# 4. Insert Monthly Plans

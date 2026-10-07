@@ -3,7 +3,7 @@ from datetime import date
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, selectinload
 
 from allur_factory.models import Downtime, MonthlyPlan, ProductionLine, ShiftMetric
 
@@ -17,6 +17,15 @@ class ProductionRepository:
 	async def get_lines(self) -> Sequence[ProductionLine]:
 		"""Get all production lines ordered by conveyor step."""
 		result = await self.db.scalars(select(ProductionLine).order_by(ProductionLine.step_order))
+		return result.all()
+
+	async def get_lines_with_equipment(self) -> Sequence[ProductionLine]:
+		"""Get all layout sections ordered by step with their equipment preloaded."""
+		result = await self.db.scalars(
+			select(ProductionLine)
+			.options(selectinload(ProductionLine.equipment))
+			.order_by(ProductionLine.step_order)
+		)
 		return result.all()
 
 	async def get_shift_metrics_by_date(self, target_date: date) -> Sequence[ShiftMetric]:

@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from allur_factory.core.database import get_db
 from allur_factory.repositories.production import ProductionRepository
 from allur_factory.services.analytics_service import AnalyticsService
+from allur_factory.services.factory_layout_service import FactoryLayoutService
 from allur_factory.services.factory_service import FactoryService
 
 GET_DB_DEPENDENCY = Depends(get_db)
@@ -30,5 +31,12 @@ def get_analytics_service(
 	return AnalyticsService(repo)
 
 
+def get_factory_layout_service(
+	repo: ProductionRepository = GET_PRODUCTION_REPOSITORY_DEPENDENCY,
+) -> FactoryLayoutService:
+	return FactoryLayoutService(repo)
+
+
 GET_FACTORY_SERVICE_DEPENDENCY = Depends(get_factory_service)
 GET_ANALYTICS_SERVICE_DEPENDENCY = Depends(get_analytics_service)
+GET_FACTORY_LAYOUT_SERVICE_DEPENDENCY = Depends(get_factory_layout_service)

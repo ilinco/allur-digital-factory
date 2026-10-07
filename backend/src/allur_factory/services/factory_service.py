@@ -20,6 +20,8 @@ LINE_NAME_TO_ID: dict[str, str] = {
 	'контроль качества-1': 'qc-1',
 	'qc': 'qc-1',
 	'qc-1': 'qc-1',
+	'склад комплектующих': 'warehouse-in',
+	'склад готовой продукции': 'warehouse-out',
 }
 
 
