@@ -1,13 +1,13 @@
-import {
-  IconClockPause,
-  IconCpu,
-} from '@tabler/icons-react';
+import { IconClockPause, IconCpu } from '@tabler/icons-react';
 import type { EquipmentNode } from '@/types/schema';
 import { Button } from '@/components/ui/Button';
 
 interface EquipmentCardProps {
   equipment: EquipmentNode;
-  onRecordDowntimeForEquipment: (equipmentName: string, equipmentId: number) => void;
+  onRecordDowntimeForEquipment: (
+    equipmentName: string,
+    equipmentId: number,
+  ) => void;
 }
 
 const EQUIPMENT_TYPE_NAMES: Record<string, string> = {
@@ -50,14 +50,14 @@ export const EquipmentCard = ({
           ? 'В строю'
           : 'Ожидание';
 
-  const statusDotClass =
+  const statusTextClass =
     equipment.status === 'critical'
-      ? 'bg-rose-500'
+      ? 'text-rose-500'
       : equipment.status === 'warning'
-        ? 'bg-amber-500'
+        ? 'text-amber-500'
         : equipment.status === 'normal'
-          ? 'bg-emerald-500'
-          : 'bg-slate-400';
+          ? 'text-emerald-500'
+          : 'text-slate-400';
 
   return (
     <div className="flex flex-col justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-2xs transition-colors hover:bg-slate-50/50">
@@ -66,8 +66,9 @@ export const EquipmentCard = ({
           <span className="truncate text-xs font-medium text-slate-400">
             {typeLabel}
           </span>
-          <div className="flex items-center gap-1.5 rounded-full border border-slate-200/80 bg-white px-2 py-0.5 text-[11px] font-medium text-slate-700">
-            <span className={`h-1.5 w-1.5 rounded-full ${statusDotClass}`} />
+          <div
+            className={`flex items-center gap-1.5 rounded-xs bg-white px-4 py-1 text-[0.75rem] font-medium ${statusTextClass}`}
+          >
             <span>{statusLabel}</span>
           </div>
         </div>

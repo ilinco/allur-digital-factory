@@ -99,6 +99,7 @@ export const SchemaPage = () => {
             <SimulationQuickBar
               onTrigger={triggerSimulation}
               isSimulating={isSimulating}
+              activeAction={simulationResponse?.action ?? null}
             />
 
             {/* Visual Conveyor Pipeline Flow (Stage 1 to N) */}

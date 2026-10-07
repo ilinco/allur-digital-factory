@@ -1,7 +1,6 @@
 import {
   IconAlertOctagon,
   IconAlertTriangle,
-  IconCheck,
   IconInfoCircle,
   IconX,
 } from '@tabler/icons-react';
@@ -17,15 +16,10 @@ export const SimulationAlertBanner = ({
   response,
   onDismiss,
 }: SimulationAlertBannerProps) => {
-  const { ai_assistant, affected_section, overall_oee, availability } = response;
+  const { ai_assistant, affected_section, overall_oee, availability } =
+    response;
   const isCritical = ai_assistant.severity === 'critical';
   const isWarning = ai_assistant.severity === 'warning';
-
-  const severityBadgeClass = isCritical
-    ? 'bg-rose-50 text-rose-700 border-rose-200'
-    : isWarning
-      ? 'bg-amber-50 text-amber-700 border-amber-200'
-      : 'bg-slate-100 text-slate-700 border-slate-200';
 
   const SeverityIcon = isCritical
     ? IconAlertOctagon
@@ -51,19 +45,10 @@ export const SimulationAlertBanner = ({
           </div>
 
           <div>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2.5">
               <h3 className="text-sm font-bold text-slate-900 sm:text-base">
                 {ai_assistant.title}
               </h3>
-              <span
-                className={`rounded-md border px-2 py-0.5 text-xs font-semibold ${severityBadgeClass}`}
-              >
-                {isCritical
-                  ? 'Критический инцидент'
-                  : isWarning
-                    ? 'Предупреждение'
-                    : 'Информация'}
-              </span>
             </div>
 
             <p className="mt-1 text-sm text-slate-600">
@@ -101,6 +86,7 @@ export const SimulationAlertBanner = ({
           onClick={onDismiss}
           title="Скрыть оповещение"
           aria-label="Скрыть оповещение"
+          className="shrink-0 text-slate-400 hover:text-slate-700"
         >
           <IconX size={18} />
         </Button>
@@ -108,16 +94,15 @@ export const SimulationAlertBanner = ({
 
       {ai_assistant.suggested_actions?.length > 0 && (
         <div className="mt-4 border-t border-slate-100 pt-3">
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+          <p className="text-xs font-semibold uppercase tracking-wider text-primary">
             Рекомендуемые действия оператору:
           </p>
           <ul className="mt-2 space-y-1.5">
             {ai_assistant.suggested_actions.map((action, idx) => (
               <li
                 key={idx}
-                className="flex items-start gap-2 text-xs font-medium text-slate-700"
+                className="flex items-start gap-2 text-xs font-medium uppercase text-slate-700"
               >
-                <IconCheck size={15} className="mt-0.5 shrink-0 text-slate-500" />
                 <span>{action}</span>
               </li>
             ))}

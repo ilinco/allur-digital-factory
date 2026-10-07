@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { IconClipboardCheck, IconX } from '@tabler/icons-react';
+import { IconX } from '@tabler/icons-react';
 import type {
   SectionEventRequest,
   SectionEventType,
@@ -11,7 +11,10 @@ interface RecordEventModalProps {
   onClose: () => void;
   sections: SectionNode[];
   initialSectionId?: string;
-  onSubmit: (sectionId: string, payload: SectionEventRequest) => Promise<unknown>;
+  onSubmit: (
+    sectionId: string,
+    payload: SectionEventRequest,
+  ) => Promise<unknown>;
   isSubmitting: boolean;
 }
 
@@ -55,17 +58,9 @@ export const RecordEventModal = ({
       <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
         <div className="flex items-center justify-between border-b border-slate-100 pb-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-700">
-              <IconClipboardCheck size={18} stroke={1.75} />
-            </div>
-            <div>
-              <h3 className="text-base font-bold text-slate-900">
-                Событие контроля ОТК
-              </h3>
-              <p className="text-xs font-medium text-slate-500">
-                POST /api/v1/sections/:id/events
-              </p>
-            </div>
+            <h3 className="text-base font-bold text-slate-900">
+              Событие контроля ОТК
+            </h3>
           </div>
           <Button
             variant="ghost"
@@ -164,10 +159,7 @@ export const RecordEventModal = ({
           )}
 
           <div className="flex items-center justify-end gap-3 pt-2">
-            <Button
-              variant="secondary"
-              onClick={onClose}
-            >
+            <Button variant="secondary" onClick={onClose}>
               Отмена
             </Button>
             <Button
