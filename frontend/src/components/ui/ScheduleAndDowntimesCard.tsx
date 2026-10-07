@@ -1,11 +1,8 @@
 import type { DowntimeIncident, StationStatus } from '@/types/dashboard';
-import {
-  IconBuildingFactory2,
-  IconChevronLeft,
-  IconChevronRight,
-  IconClockPause,
-} from '@tabler/icons-react';
+import { IconBuildingFactory2, IconClockPause } from '@tabler/icons-react';
 import { useState } from 'react';
+import { DateStripSelector } from '@/components/ui/DateStripSelector';
+import { CardTabs } from '@/components/ui/CardTabs';
 
 interface ScheduleAndDowntimesCardProps {
   selectedDate: string;
@@ -66,66 +63,32 @@ export const ScheduleAndDowntimesCard = ({
       <div className="flex flex-1 flex-col justify-between p-5">
         <div>
           {/* Date Selector Strip */}
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-primary shadow-2xs transition-colors hover:bg-slate-50"
-              title="Назад"
-            >
-              <IconChevronLeft size={16} stroke={2} />
-            </button>
-            <div className="flex flex-1 items-center justify-between rounded-xl border border-slate-200 bg-slate-50/70 p-1 text-xs sm:text-sm font-medium">
-              {dates.map((d) => (
-                <button
-                  key={d.value}
-                  type="button"
-                  onClick={() => onSelectDate(d.value)}
-                  className={`cursor-pointer rounded-lg px-2.5 py-1 transition-colors ${
-                    selectedDate === d.value
-                      ? 'bg-white font-semibold text-primary shadow-xs'
-                      : 'text-slate-500 hover:text-slate-800'
-                  }`}
-                >
-                  {d.label}
-                </button>
-              ))}
-            </div>
-            <button
-              type="button"
-              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-primary shadow-2xs transition-colors hover:bg-slate-50"
-              title="Вперед"
-            >
-              <IconChevronRight size={16} stroke={2} />
-            </button>
-          </div>
+          <DateStripSelector
+            dates={dates}
+            selectedDate={selectedDate}
+            onSelectDate={onSelectDate}
+          />
 
           {/* Tab switchers */}
-          <div className="mt-3.5 flex border-b border-slate-200 text-sm font-medium text-slate-500">
-            <button
-              type="button"
-              onClick={() => setActiveTab('stations')}
-              className={`flex flex-1 cursor-pointer items-center justify-center gap-2 pb-2.5 transition-colors ${
-                activeTab === 'stations'
-                  ? 'border-b-2 border-primary font-semibold text-primary'
-                  : 'hover:text-slate-700'
-              }`}
-            >
-              <IconBuildingFactory2 size={17} />
-              <span>Станции ({stations.length})</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab('downtimes')}
-              className={`flex flex-1 cursor-pointer items-center justify-center gap-2 pb-2.5 transition-colors ${
-                activeTab === 'downtimes'
-                  ? 'border-b-2 border-primary font-semibold text-primary'
-                  : 'hover:text-slate-700'
-              }`}
-            >
-              <IconClockPause size={17} />
-              <span>Простои ({downtimes.length})</span>
-            </button>
-          </div>
+          <CardTabs<'stations' | 'downtimes'>
+            className="mt-3.5"
+            activeTab={activeTab}
+            onChange={setActiveTab}
+            tabs={[
+              {
+                id: 'stations',
+                label: 'Станции',
+                icon: <IconBuildingFactory2 size={17} />,
+                count: stations.length,
+              },
+              {
+                id: 'downtimes',
+                label: 'Простои',
+                icon: <IconClockPause size={17} />,
+                count: downtimes.length,
+              },
+            ]}
+          />
         </div>
 
         {/* Tab Content */}

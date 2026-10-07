@@ -8,6 +8,7 @@ import { ModelsProgressCard } from "@/components/ui/ModelsProgressCard";
 import { DefectDistributionCard } from "@/components/ui/DefectDistributionCard";
 import { ScheduleAndDowntimesCard } from "@/components/ui/ScheduleAndDowntimesCard";
 import { StationsLoadCard } from "@/components/ui/StationsLoadCard";
+import { Button } from "@/components/ui/Button";
 
 export const HomePage = () => {
   const [selectedDate, setSelectedDate] = useState<string>("2026-10-02");
@@ -55,13 +56,13 @@ export const HomePage = () => {
               <p className="mt-1.5 text-sm font-medium text-slate-500">
                 Проверьте соединение с API (http://localhost:8000)
               </p>
-              <button
-                type="button"
+              <Button
+                variant="primary"
                 onClick={refetchAll}
-                className="mt-4 cursor-pointer rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800"
+                className="mt-4"
               >
                 Повторить попытку
-              </button>
+              </Button>
             </div>
           ) : (
             <>

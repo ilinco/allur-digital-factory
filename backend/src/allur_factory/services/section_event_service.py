@@ -26,6 +26,8 @@ class SectionEventService:
 		target_date = payload.record_date
 		if target_date is None:
 			target_date = await self.repository.get_latest_record_date() or date(2026, 10, 2)
+		elif isinstance(target_date, str):
+			target_date = date.fromisoformat(target_date)
 
 		metric = await self.repository.get_shift_metric_for_line(line.id, target_date)
 		if metric is None:
@@ -40,26 +42,34 @@ class SectionEventService:
 				defect_percent=0.0,
 			)
 
-		if payload.event_type == 'pass':
-			metric.fact += payload.count
-		elif payload.event_type == 'defect':
-			metric.defects_count = (metric.defects_count or 0) + payload.count
-			metric.fact = max(metric.fact, metric.defects_count)
+		fact_val = int(metric.fact or 0)
+		defects_val = int(metric.defects_count or 0)
 
-		plan_val = metric.plan if metric.plan is not None else 120
-		metric.load_percent = round((metric.fact / plan_val) * 100, 2) if plan_val > 0 else 0.0
-		metric.defect_percent = (
-			round((metric.defects_count / metric.fact) * 100, 2) if metric.fact > 0 else 0.0
+		if payload.event_type == 'pass':
+			fact_val += payload.count
+		elif payload.event_type == 'defect':
+			defects_val += payload.count
+			fact_val = max(fact_val, defects_val)
+
+		plan_val = int(metric.plan if metric.plan is not None else 120)
+		load_percent = round((fact_val / plan_val) * 100, 2) if plan_val > 0 else 0.0
+		defect_percent = (
+			round((defects_val / fact_val) * 100, 2) if fact_val > 0 else 0.0
 		)
 
-		is_alert = metric.defect_percent > 2.0
+		metric.fact = fact_val
+		metric.defects_count = defects_val
+		metric.load_percent = float(load_percent)
+		metric.defect_percent = float(defect_percent)
+
+		is_alert = bool(defect_percent > 2.0)
 
 		await self.repository.add_or_update_shift_metric(metric)
 		await self.repository.commit()
 
 		downtimes = await self.repository.get_downtimes_by_date(target_date)
 		section_dt = sum(
-			d.duration_minutes
+			int(d.duration_minutes or 0)
 			for d in downtimes
 			if (d.line_id == line.id)
 			or (
@@ -67,11 +77,11 @@ class SectionEventService:
 			)
 		)
 
-		status = determine_station_status(section_dt, metric.defect_percent)
+		status = determine_station_status(int(section_dt), float(defect_percent))
 
 		alert_msg = (
 			f"Внимание! На участке '{line.name}' уровень брака превысил порог 2.0%: "
-			f'текущий показатель {metric.defect_percent}%. Необходим контроль ОТК.'
+			f'текущий показатель {defect_percent}%. Необходим контроль ОТК.'
 			if is_alert
 			else None
 		)
@@ -82,11 +92,11 @@ class SectionEventService:
 			record_date=target_date.isoformat(),
 			event_type=payload.event_type,
 			count=payload.count,
-			fact=metric.fact,
+			fact=fact_val,
 			plan=plan_val,
-			defects_count=metric.defects_count or 0,
-			defect_percent=metric.defect_percent,
-			load_percent=metric.load_percent,
+			defects_count=defects_val,
+			defect_percent=float(defect_percent),
+			load_percent=float(load_percent),
 			status=status,
 			is_alert=is_alert,
 			alert_message=alert_msg,

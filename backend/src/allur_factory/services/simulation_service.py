@@ -1,7 +1,7 @@
 from datetime import date
 
 from allur_factory.core.exceptions import NotFoundException
-from allur_factory.models import Downtime
+from allur_factory.models import Downtime, ShiftMetric
 from allur_factory.repositories.production import ProductionRepository
 from allur_factory.schemas.simulation import (
 	AffectedSectionInfo,
@@ -23,6 +23,8 @@ class SimulationService:
 		target_date = payload.record_date
 		if target_date is None:
 			target_date = await self.repository.get_latest_record_date() or date(2026, 10, 2)
+		elif isinstance(target_date, str):
+			target_date = date.fromisoformat(target_date)
 
 		target_section_id = payload.section_id or 'welding-1'
 		normalized_id = target_section_id.strip().lower()
@@ -32,20 +34,29 @@ class SimulationService:
 		if line is None:
 			raise NotFoundException(f"Section '{target_section_id}' not found")
 
-		action = payload.action
+		action = payload.action or 'breakdown'
 		message = ''
 
 		if action in ('breakdown', 'critical_stop'):
-			duration = payload.duration_minutes or 75
+			duration = int(payload.duration_minutes or 75)
+			target_equipment_name = 'ABB-04' if action == 'breakdown' else 'Конвейер-03'
+			equipments = await self.repository.get_equipment_by_line(line.id)
+			matched_equipment = next(
+				(e for e in equipments if e.name.strip().lower() == target_equipment_name.lower()),
+				equipments[0] if equipments else None,
+			)
+			eq_name = matched_equipment.name if matched_equipment else target_equipment_name
+			eq_id = matched_equipment.id if matched_equipment else None
 			reason = (
 				payload.reason
-				or '[SIMULATION] Аварийный останов: заклинивание поворотного редуктора робота ABB-04'
+				or f'[SIMULATION] Аварийный останов: заклинивание поворотного редуктора робота {eq_name}'
 			)
 			dt = Downtime(
 				record_date=target_date,
 				section=line.name,
 				line_id=line.id,
-				equipment='ABB-04',
+				equipment=eq_name,
+				equipment_id=eq_id,
 				reason=reason,
 				duration_minutes=duration,
 			)
@@ -58,12 +69,29 @@ class SimulationService:
 
 		elif action == 'defect_spike':
 			metric = await self.repository.get_shift_metric_for_line(line.id, target_date)
-			if metric is not None:
-				metric.defects_count = (metric.defects_count or 0) + 8
-				metric.fact = max(metric.fact, metric.defects_count)
-				metric.defect_percent = round((metric.defects_count / metric.fact) * 100, 2)
-				await self.repository.add_or_update_shift_metric(metric)
-				await self.repository.commit()
+			if metric is None:
+				metric = ShiftMetric(
+					record_date=target_date,
+					line_id=line.id,
+					plan=120,
+					fact=120,
+					work_hours=8.0,
+					load_percent=100.0,
+					defects_count=0,
+					defect_percent=0.0,
+				)
+			defects = int(metric.defects_count or 0) + 8
+			metric.defects_count = defects
+			metric.fact = max(int(metric.fact or 0), defects)
+			plan_val = int(metric.plan if metric.plan is not None else 120)
+			metric.defect_percent = (
+				round(float((defects / metric.fact) * 100), 2) if metric.fact > 0 else 0.0
+			)
+			metric.load_percent = (
+				round(float((metric.fact / plan_val) * 100), 2) if plan_val > 0 else 0.0
+			)
+			await self.repository.add_or_update_shift_metric(metric)
+			await self.repository.commit()
 			message = (
 				f'Внештатная ситуация активирована: зафиксирован всплеск брака '
 				f'на участке {line.name}.'
@@ -78,7 +106,7 @@ class SimulationService:
 		metrics = await self.repository.get_shift_metrics_by_date(target_date)
 
 		section_dt = sum(
-			d.duration_minutes
+			int(d.duration_minutes or 0)
 			for d in downtimes
 			if (d.line_id == line.id)
 			or (
@@ -88,20 +116,20 @@ class SimulationService:
 
 		section_metric = await self.repository.get_shift_metric_for_line(line.id, target_date)
 		defect_pct = (
-			float(section_metric.defect_percent)
+			round(float(section_metric.defect_percent or 0.0), 2)
 			if section_metric and section_metric.defect_percent is not None
 			else 0.0
 		)
 
-		section_status = determine_station_status(section_dt, defect_pct)
+		section_status = determine_station_status(int(section_dt), float(defect_pct))
 
-		total_dt = sum(d.duration_minutes for d in downtimes)
-		total_fact = sum(m.fact for m in metrics)
-		total_plan = sum(m.plan if m.plan is not None else 0 for m in metrics)
-		total_defects = sum(m.defects_count if m.defects_count is not None else 0 for m in metrics)
+		total_dt = sum(int(d.duration_minutes or 0) for d in downtimes)
+		total_fact = sum(int(m.fact or 0) for m in metrics)
+		total_plan = sum(int(m.plan if m.plan is not None else 0) for m in metrics)
+		total_defects = sum(int(m.defects_count if m.defects_count is not None else 0) for m in metrics)
 
 		if metrics and total_plan > 0:
-			oee_res = calculate_oee(total_dt, total_fact, total_plan, total_defects)
+			oee_res = calculate_oee(int(total_dt), int(total_fact), int(total_plan), int(total_defects))
 		else:
 			oee_res = {
 				'availability': 0.0,
@@ -161,11 +189,11 @@ class SimulationService:
 				id=line.id,
 				name=line.name,
 				status=section_status,
-				downtime_min=section_dt,
-				defect_percent=defect_pct,
+				downtime_min=int(section_dt),
+				defect_percent=float(defect_pct),
 			),
-			overall_oee=oee_res['oee'],
-			availability=oee_res['availability'],
-			is_oee_alert=oee_res['is_alert'],
+			overall_oee=float(oee_res['oee']),
+			availability=float(oee_res['availability']),
+			is_oee_alert=bool(oee_res['is_alert']),
 			ai_assistant=ai_assistant,
 		)

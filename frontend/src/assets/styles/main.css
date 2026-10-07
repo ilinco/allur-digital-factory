@@ -3,6 +3,9 @@
 @theme {
   --font-sans: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --color-primary: #ff2e1f;
+  --color-primary-light: #ff4a3d;
+  --color-primary-dark: #db1f12;
+  --color-primary-border: #b8160b;
 }
 
 body {
@@ -29,6 +32,16 @@ input[type="range"],
 label[for],
 label:has(input) {
   cursor: pointer;
+}
+
+button,
+[role="button"] {
+  outline: none;
+}
+
+button:focus,
+[role="button"]:focus {
+  outline: none;
 }
 
 button:disabled,

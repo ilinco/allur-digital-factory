@@ -1,17 +1,148 @@
-import { PageContent } from "@/components/layout/PageContent";
-import { PageHeader } from "@/components/layout/PageHeader";
+import { useState } from 'react';
+import { PageContent } from '@/components/layout/PageContent';
+import { ConveyorPipelineFlow } from '@/components/ui/schema/ConveyorPipelineFlow';
+import { RecordDowntimeModal } from '@/components/ui/schema/RecordDowntimeModal';
+import { RecordEventModal } from '@/components/ui/schema/RecordEventModal';
+import { SchemaHeader } from '@/components/ui/schema/SchemaHeader';
+import { SchemaKpiCards } from '@/components/ui/schema/SchemaKpiCards';
+import { SectionEquipmentGrid } from '@/components/ui/schema/SectionEquipmentGrid';
+import { SimulationAlertBanner } from '@/components/ui/schema/SimulationAlertBanner';
+import { SimulationQuickBar } from '@/components/ui/schema/SimulationQuickBar';
+import { Button } from '@/components/ui/Button';
+import { useFactoryLayoutData } from '@/hooks/useFactoryLayoutData';
 
 export const SchemaPage = () => {
+  const [selectedDate, setSelectedDate] = useState<string>('2026-10-02');
+  const [isDowntimeModalOpen, setIsDowntimeModalOpen] = useState(false);
+  const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+  const [modalEquipment, setModalEquipment] = useState<{
+    name?: string;
+    id?: number;
+  }>({});
+
+  const {
+    sections,
+    selectedSection,
+    selectedSectionId,
+    setSelectedSectionId,
+    stats,
+    isLoading,
+    isFetching,
+    isError,
+    refetchAll,
+    simulationResponse,
+    clearSimulationAlert,
+    triggerSimulation,
+    isSimulating,
+    recordDowntimeAction,
+    isRecordingDowntime,
+    recordEventAction,
+    isRecordingEvent,
+  } = useFactoryLayoutData(selectedDate);
+
+  const handleOpenDowntimeModal = (
+    equipmentName?: string,
+    equipmentId?: number,
+  ) => {
+    setModalEquipment({ name: equipmentName, id: equipmentId });
+    setIsDowntimeModalOpen(true);
+  };
+
   return (
     <>
-      <PageHeader title="Схема производства" />
+      <SchemaHeader
+        selectedDate={selectedDate}
+        onSelectDate={setSelectedDate}
+        onRefresh={refetchAll}
+        isRefreshing={isFetching}
+        onOpenDowntimeModal={() => handleOpenDowntimeModal()}
+        onOpenEventModal={() => setIsEventModalOpen(true)}
+      />
+
       <PageContent>
-        <section className="flex flex-1 items-center justify-center rounded-2xl border border-dashed border-neutral-200 bg-white p-8">
-          <p className="text-sm font-medium text-slate-500">
-            Здесь будет схема участков и оборудования
-          </p>
-        </section>
+        {isLoading ? (
+          <div className="space-y-4 animate-pulse">
+            <div className="h-28 rounded-2xl border border-slate-200 bg-white" />
+            <div className="h-44 rounded-2xl border border-slate-200 bg-white" />
+            <div className="h-72 rounded-2xl border border-slate-200 bg-white" />
+          </div>
+        ) : isError ? (
+          <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-xs">
+            <p className="text-base font-semibold text-rose-600">
+              Не удалось загрузить схему производства
+            </p>
+            <p className="mt-1.5 text-sm font-medium text-slate-500">
+              Проверьте соединение с API цифрового двойника
+            </p>
+            <Button
+              variant="primary"
+              onClick={refetchAll}
+              className="mt-4"
+            >
+              Повторить попытку
+            </Button>
+          </div>
+        ) : (
+          <>
+            {/* Top Aggregate KPI row */}
+            <SchemaKpiCards stats={stats} />
+
+            {/* AI Assistant incident alert if simulation triggered */}
+            {simulationResponse && (
+              <SimulationAlertBanner
+                response={simulationResponse}
+                onDismiss={clearSimulationAlert}
+              />
+            )}
+
+            {/* Simulation Quick Bar for Jury Demo */}
+            <SimulationQuickBar
+              onTrigger={triggerSimulation}
+              isSimulating={isSimulating}
+            />
+
+            {/* Visual Conveyor Pipeline Flow (Stage 1 to N) */}
+            <ConveyorPipelineFlow
+              sections={sections}
+              selectedSectionId={selectedSectionId}
+              onSelectSection={setSelectedSectionId}
+            />
+
+            {/* Selected Section Detail and Equipment Registry */}
+            <SectionEquipmentGrid
+              section={selectedSection}
+              onRecordDowntime={(eqName, eqId) =>
+                handleOpenDowntimeModal(eqName, eqId)
+              }
+              onRecordEvent={() => setIsEventModalOpen(true)}
+            />
+          </>
+        )}
       </PageContent>
+
+      {isDowntimeModalOpen && (
+        <RecordDowntimeModal
+          onClose={() => setIsDowntimeModalOpen(false)}
+          sections={sections}
+          initialSectionId={selectedSectionId}
+          initialEquipmentName={modalEquipment.name}
+          initialEquipmentId={modalEquipment.id}
+          onSubmit={recordDowntimeAction}
+          isSubmitting={isRecordingDowntime}
+        />
+      )}
+
+      {isEventModalOpen && (
+        <RecordEventModal
+          onClose={() => setIsEventModalOpen(false)}
+          sections={sections}
+          initialSectionId={selectedSectionId}
+          onSubmit={(sectionId, payload) =>
+            recordEventAction({ sectionId, payload })
+          }
+          isSubmitting={isRecordingEvent}
+        />
+      )}
     </>
   );
 };

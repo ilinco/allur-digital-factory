@@ -93,7 +93,7 @@ class ProductionRepository:
 		if target_date is not None:
 			stmt = stmt.where(Downtime.record_date == target_date)
 		result = await self.db.execute(stmt)
-		return int(result.rowcount or 0)
+		return int(getattr(result, 'rowcount', 0) or 0)
 
 	async def get_monthly_plans(self) -> Sequence[MonthlyPlan]:
 		"""Get all vehicle model monthly production plans."""
