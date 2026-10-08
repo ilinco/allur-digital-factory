@@ -68,20 +68,6 @@ export const ForecastDailyPaceCard = ({
               </h2>
             </div>
           </div>
-
-          <span className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold text-slate-700">
-            {isAnalyzing ? (
-              <>
-                <IconLoader2 size={12} className="animate-spin text-primary" />
-                AI: Анализ...
-              </>
-            ) : (
-              <>
-                <IconSparkles size={12} className="text-primary" />
-                AI: 94.8% точность
-              </>
-            )}
-          </span>
         </div>
 
         {/* Core Metrics Summary */}
@@ -189,7 +175,8 @@ export const ForecastDailyPaceCard = ({
           {/* Selected day status callout */}
           <div className="mt-2 flex items-center justify-between text-xs text-slate-600">
             <span>
-              Выбран день: <strong className="text-slate-900">{activeDay.day}</strong>
+              Выбран день:{' '}
+              <strong className="text-slate-900">{activeDay.day}</strong>
             </span>
             <span className="font-semibold text-slate-900">
               {activeDay.units.toLocaleString('ru-RU')} шт.{' '}
@@ -208,14 +195,14 @@ export const ForecastDailyPaceCard = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900">
             {isAnalyzing ? (
-              <IconLoader2 size={14} className="animate-spin text-primary" />
+              <IconLoader2 size={14} className="animate-spin text-slate-900" />
             ) : (
-              <IconSparkles size={14} className="text-primary" />
+              <IconSparkles size={14} className="text-slate-900" />
             )}
             <span>Рекомендации ИИ по ритму:</span>
           </div>
           {isAnalyzing ? (
-            <span className="text-[11px] font-semibold text-primary flex items-center gap-1">
+            <span className="text-[11px] font-semibold text-slate-900 flex items-center gap-1">
               Расчет рекомендаций...
             </span>
           ) : (
@@ -228,7 +215,7 @@ export const ForecastDailyPaceCard = ({
         <div className="mt-2 space-y-2 text-xs text-slate-700">
           {displayRecs.map((rec, idx) => (
             <div key={idx} className="flex items-start gap-2">
-              <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+              <span className="font-bold">{idx + 1}</span>
               <span className="leading-snug">{rec}</span>
             </div>
           ))}

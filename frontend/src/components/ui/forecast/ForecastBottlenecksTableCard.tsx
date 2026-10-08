@@ -68,8 +68,13 @@ export const ForecastBottlenecksTableCard = ({
   bottlenecks,
   onOpenSimulation,
 }: ForecastBottlenecksTableCardProps) => {
-  const totalLostUnits = bottlenecks.reduce((sum, b) => sum + b.impact_lost_units, 0);
-  const criticalCount = bottlenecks.filter((b) => b.risk_level === 'critical').length;
+  const totalLostUnits = bottlenecks.reduce(
+    (sum, b) => sum + b.impact_lost_units,
+    0,
+  );
+  const criticalCount = bottlenecks.filter(
+    (b) => b.risk_level === 'critical',
+  ).length;
 
   return (
     <div className="flex h-full min-h-[340px] flex-col rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs">
@@ -90,7 +95,8 @@ export const ForecastBottlenecksTableCard = ({
               </span>
             </div>
             <p className="text-xs text-slate-500">
-              Выявление сдерживающих факторов с расчетом потерь выпуска и превентивных мер
+              Выявление сдерживающих факторов с расчетом потерь выпуска и
+              превентивных мер
             </p>
           </div>
         </div>
@@ -101,7 +107,7 @@ export const ForecastBottlenecksTableCard = ({
           onClick={onOpenSimulation}
           className="rounded-xl px-5 py-2 text-xs font-semibold shadow-xs"
         >
-          Симуляция «Что-если»
+          Симуляция
         </Button>
       </div>
 
@@ -209,7 +215,10 @@ export const ForecastBottlenecksTableCard = ({
                   {/* Рекомендация ИИ */}
                   <td className="py-3.5 px-3">
                     <div className="flex items-center gap-1.5 text-xs text-slate-700">
-                      <IconSparkles size={13} className="text-primary shrink-0" />
+                      <IconSparkles
+                        size={13}
+                        className="text-primary shrink-0"
+                      />
                       <span className="line-clamp-2 max-w-xs">{aiRec}</span>
                     </div>
                   </td>
@@ -244,11 +253,13 @@ export const ForecastBottlenecksTableCard = ({
         <div className="flex items-center gap-2">
           <span className="font-semibold text-slate-900">ИИ-вердикт:</span>
           <span>
-            Превентивное устранение риска Конвейер-03 вернет прогнозный OEE к целевым 85.2% и сократит сменный дефицит.
+            Превентивное устранение риска Конвейер-03 вернет прогнозный OEE к
+            целевым 85.2% и сократит сменный дефицит.
           </span>
         </div>
         <span className="font-semibold text-slate-900">
-          Суммарный дефицит: <span className="text-rose-600">-{totalLostUnits} шт.</span>
+          Суммарный дефицит:{' '}
+          <span className="text-rose-600">-{totalLostUnits} шт.</span>
         </span>
       </div>
     </div>

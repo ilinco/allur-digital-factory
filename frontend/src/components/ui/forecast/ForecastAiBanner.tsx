@@ -1,11 +1,5 @@
 import { useEffect, useState } from 'react';
-import {
-  IconAdjustments,
-  IconBrain,
-  IconLoader2,
-  IconShieldCheck,
-  IconSparkles,
-} from '@tabler/icons-react';
+import { IconAdjustments, IconBrain, IconLoader2 } from '@tabler/icons-react';
 import { Button } from '@/components/ui/Button';
 
 export interface ForecastAiBannerProps {
@@ -22,7 +16,6 @@ const ANALYSIS_STAGES = [
 
 export const ForecastAiBanner = ({
   onOpenSimulation,
-  bottlenecksCount,
   isAnalyzing = false,
 }: ForecastAiBannerProps) => {
   const [stageIndex, setStageIndex] = useState(0);
@@ -53,18 +46,6 @@ export const ForecastAiBanner = ({
           </div>
 
           <div className="space-y-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-semibold text-slate-800">
-                <IconSparkles size={13} className="text-primary" />
-                Цифровой двойник Allur AI
-              </span>
-              <span className="text-xs font-medium text-slate-400">
-                {isAnalyzing
-                  ? 'Выполняется предиктивный расчет (~25-30 сек)'
-                  : 'Версия предиктивной модели 2.4'}
-              </span>
-            </div>
-
             <p className="text-sm font-semibold text-slate-900">
               {isAnalyzing
                 ? 'Нейросеть рассчитывает суточный такт и риски простоев'
@@ -94,7 +75,9 @@ export const ForecastAiBanner = ({
                   <span className="h-2 w-2 rounded-full bg-primary animate-ping" />
                   Расчет рекомендаций
                 </span>
-                <span className="font-bold text-slate-900">{progressPercent}%</span>
+                <span className="font-bold text-slate-900">
+                  {progressPercent}%
+                </span>
               </div>
               <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
                 <div
@@ -105,36 +88,14 @@ export const ForecastAiBanner = ({
             </div>
           ) : (
             <>
-              <div className="flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-2 text-xs">
-                <IconShieldCheck size={16} className="text-emerald-600" />
-                <div>
-                  <span className="block text-[11px] font-medium text-slate-400">
-                    Точность прогноза
-                  </span>
-                  <span className="font-bold text-slate-900">94.8% (±2.8%)</span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-2 text-xs">
-                <div className="h-2 w-2 rounded-full bg-amber-500" />
-                <div>
-                  <span className="block text-[11px] font-medium text-slate-400">
-                    Факторы риска
-                  </span>
-                  <span className="font-bold text-slate-900">
-                    {bottlenecksCount} узких места
-                  </span>
-                </div>
-              </div>
-
               <Button
                 variant="primary"
                 size="md"
                 onClick={onOpenSimulation}
                 leftIcon={<IconAdjustments size={16} stroke={1.75} />}
-                className="rounded-xl px-4 py-2 text-xs font-semibold shadow-xs"
+                className="rou  nded-xl px-4 py-2 text-xs font-semibold shadow-xs"
               >
-                Симуляция «Что-если»
+                Симуляция
               </Button>
             </>
           )}

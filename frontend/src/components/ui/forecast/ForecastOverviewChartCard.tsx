@@ -48,10 +48,6 @@ export const ForecastOverviewChartCard = ({
             ИИ-обзор прогноза выпуска ({horizonSubtitle})
           </h2>
         </div>
-
-        <span className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold text-slate-700">
-          Предиктивный горизонт
-        </span>
       </div>
 
       {/* Main Metric Highlight */}

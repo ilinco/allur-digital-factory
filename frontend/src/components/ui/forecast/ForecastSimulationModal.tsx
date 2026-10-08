@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { IconBulb, IconClockPause, IconX } from '@tabler/icons-react';
+import { IconClockPause, IconX } from '@tabler/icons-react';
 import { Button } from '@/components/ui/Button';
 import type { PredictiveForecastResponse } from '@/types/forecast';
 
@@ -52,7 +52,7 @@ export const ForecastSimulationModal = ({
           <div className="flex items-center gap-2.5">
             <div>
               <h3 className="text-base font-bold text-slate-900">
-                Симуляция сценария «Что-если»
+                Симуляция сценария
               </h3>
               <p className="text-xs font-medium text-slate-500">
                 Оценка чувствительности OEE и сменного плана к сбоям
@@ -102,7 +102,7 @@ export const ForecastSimulationModal = ({
                 <IconClockPause
                   size={16}
                   stroke={1.75}
-                  className="text-rose-600"
+                  className="text-primary"
                 />
                 <span>Имитация дополнительного простоя:</span>
               </div>
@@ -164,7 +164,6 @@ export const ForecastSimulationModal = ({
           {/* AI Recommendations Section */}
           <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
             <div className="flex items-center gap-2 text-xs font-bold text-slate-900">
-              <IconBulb size={16} stroke={1.75} className="text-amber-500" />
               <span>Рекомендации ИИ:</span>
             </div>
             <ul className="mt-2 space-y-2 text-xs font-medium text-slate-600">
