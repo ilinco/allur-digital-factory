@@ -7,7 +7,6 @@ import {
   IconLoader2,
   IconPaint,
   IconRobot,
-  IconSparkles,
 } from '@tabler/icons-react';
 
 const PIPELINE_STEPS = [

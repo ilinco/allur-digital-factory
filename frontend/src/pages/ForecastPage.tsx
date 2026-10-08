@@ -99,8 +99,8 @@ export const ForecastPage = () => {
             </div>
 
             {/* Bottom Row: Distribution Donut Chart (4 cols) + Bottlenecks List/Table (8 cols) */}
-            <div className="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-12">
-              <div className="lg:col-span-5 xl:col-span-4">
+            <div className="grid grid-cols-1 items-start gap-4 sm:gap-5 lg:grid-cols-12">
+              <div className="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-4">
                 <ForecastDistributionCard data={distributionData} />
               </div>
               <div className="lg:col-span-7 xl:col-span-8">

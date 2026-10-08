@@ -12,7 +12,7 @@ export const ForecastDistributionCard = ({
   const totalUnits = data.reduce((sum, item) => sum + item.units, 0);
 
   return (
-    <div className="flex h-full flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
+    <div className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-100 pb-4">
         <div className="flex items-center gap-2">
