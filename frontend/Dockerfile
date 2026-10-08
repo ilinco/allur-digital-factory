@@ -17,6 +17,9 @@ CMD ["pnpm", "dev", "--host", "0.0.0.0"]
 # Build stage
 FROM dev AS build
 
+ARG VITE_API_URL=""
+ENV VITE_API_URL=$VITE_API_URL
+
 RUN pnpm build
 
 # Production stage with Nginx
