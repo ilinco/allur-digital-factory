@@ -16,6 +16,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       target: prod
+      args:
+        - VITE_API_URL=${VITE_API_URL:-}
     container_name: allur-frontend-prod
     ports:
       - "80:80"

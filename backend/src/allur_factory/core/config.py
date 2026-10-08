@@ -1,6 +1,8 @@
+import json
 from functools import lru_cache
+from typing import Any
 
-from pydantic import AliasChoices, Field
+from pydantic import AliasChoices, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -13,7 +15,35 @@ class Settings(BaseSettings):
 	)
 
 	PROJECT_NAME: str = 'Allur Digital Factory'
-	CORS_ALLOW_ORIGINS: list[str] = ['http://localhost:5173']
+	CORS_ALLOW_ORIGINS: list[str] | str = Field(
+		default=['http://localhost:5173'],
+		validation_alias=AliasChoices(
+			'cors_allow_origins',
+			'CORS_ALLOW_ORIGINS',
+			'cors_origins',
+			'CORS_ORIGINS',
+		),
+	)
+
+	@field_validator('CORS_ALLOW_ORIGINS', mode='before')
+	@classmethod
+	def parse_cors_origins(cls, v: Any) -> list[str]:
+		if isinstance(v, str):
+			s = v.strip()
+			if not s:
+				return []
+			if s.startswith('[') and s.endswith(']'):
+				try:
+					parsed = json.loads(s)
+					if isinstance(parsed, list):
+						return [str(item).strip() for item in parsed if str(item).strip()]
+				except Exception:
+					pass
+			return [item.strip() for item in s.split(',') if item.strip()]
+		if isinstance(v, (list, tuple, set)):
+			return [str(item).strip() for item in v if str(item).strip()]
+		return v
+
 	DB_ECHO: bool = False
 
 	OPENROUTER_API_KEY: str | None = Field(
