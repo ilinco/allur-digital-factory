@@ -2,12 +2,16 @@
 
 Платформа цифрового двойника и операционной аналитики производственных линий для расчета OEE, мониторинга простоев и предиктивной оптимизации рабочих процессов.
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-online-success?style=flat)](https://greenstonehub.digital)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen?style=flat)](#)
 [![Version](https://img.shields.io/badge/version-0.1.0-blue?style=flat)](#)
 [![Python](https://img.shields.io/badge/python-3.12-3776AB?style=flat)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.142+-009688?style=flat)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=flat)](https://react.dev/)
 [![Docker](https://img.shields.io/badge/Docker-ready-2496ED?style=flat)](https://www.docker.com/)
+
+> 🌐 **Демо:** [https://greenstonehub.digital](https://greenstonehub.digital)  
+> 📖 **Интерактивная документация API (Swagger):** [https://greenstonehub.digital/docs](https://greenstonehub.digital/docs)
 
 ---
 
