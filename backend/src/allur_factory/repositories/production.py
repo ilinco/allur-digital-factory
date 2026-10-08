@@ -112,6 +112,36 @@ class ProductionRepository:
 		result = await self.db.scalar(select(func.max(ShiftMetric.record_date)))
 		return result
 
+	async def get_available_dates(self) -> Sequence[date]:
+		"""Get all distinct record dates available in shift metrics ordered ascending."""
+		result = await self.db.scalars(
+			select(ShiftMetric.record_date).distinct().order_by(ShiftMetric.record_date)
+		)
+		return result.all()
+
+	async def get_shift_metrics_range(
+		self, start_date: date, end_date: date
+	) -> Sequence[ShiftMetric]:
+		"""Get shift metrics within an inclusive date range."""
+		result = await self.db.scalars(
+			select(ShiftMetric)
+			.options(joinedload(ShiftMetric.line))
+			.where(ShiftMetric.record_date >= start_date, ShiftMetric.record_date <= end_date)
+			.order_by(ShiftMetric.record_date, ShiftMetric.line_id)
+		)
+		return result.all()
+
+	async def get_downtimes_range(
+		self, start_date: date, end_date: date
+	) -> Sequence[Downtime]:
+		"""Get equipment downtimes within an inclusive date range."""
+		result = await self.db.scalars(
+			select(Downtime)
+			.where(Downtime.record_date >= start_date, Downtime.record_date <= end_date)
+			.order_by(Downtime.record_date, Downtime.id)
+		)
+		return result.all()
+
 	async def commit(self) -> None:
 		"""Commit current database transaction."""
 		await self.db.commit()

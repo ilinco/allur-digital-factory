@@ -50,3 +50,19 @@ export interface HourlyPacePoint {
   paintingFact: number;
   assemblyFact: number;
 }
+
+export interface AvailableDatesResponse {
+  dates: string[];
+  latest_date: string;
+}
+
+export interface DowntimeRecord {
+  id: number;
+  record_date: string;
+  section_id: string;
+  section_name: string;
+  equipment: string;
+  equipment_id: number | null;
+  reason: string;
+  duration_minutes: number;
+}

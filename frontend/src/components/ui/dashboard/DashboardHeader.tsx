@@ -19,12 +19,18 @@ export const DashboardHeader = ({
   isRefreshing,
   onOpenGuide,
 }: DashboardHeaderProps) => {
-  const formattedDate =
-    selectedDate === '2026-10-02'
-      ? '02 Окт 2026'
-      : selectedDate === '2026-10-01'
-        ? '01 Окт 2026'
-        : selectedDate;
+  const formattedDate = (() => {
+    const parts = selectedDate.split('-');
+    if (parts.length === 3) {
+      const months: Record<string, string> = {
+        '01': 'Янв', '02': 'Фев', '03': 'Мар', '04': 'Апр',
+        '05': 'Май', '06': 'Июн', '07': 'Июл', '08': 'Авг',
+        '09': 'Сен', '10': 'Окт', '11': 'Ноя', '12': 'Дек',
+      };
+      return `${parts[2]} ${months[parts[1]] ?? parts[1]} ${parts[0]}`;
+    }
+    return selectedDate;
+  })();
 
   return (
     <PageHeader

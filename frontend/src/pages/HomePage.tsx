@@ -13,7 +13,7 @@ import { ErrorCard } from '@/components/ui/error/ErrorCard';
 import { useLockedBody } from '@/hooks/useLockedBody';
 
 export const HomePage = () => {
-  const [selectedDate, setSelectedDate] = useState<string>('2026-10-02');
+  const [selectedDate, setSelectedDate] = useState<string>('2026-10-08');
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   const {
     kpi,

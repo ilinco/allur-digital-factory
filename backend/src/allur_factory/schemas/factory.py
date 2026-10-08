@@ -23,6 +23,11 @@ class PipelineResponse(BaseModel):
 	stations: list[StationStatus]
 
 
+class AvailableDatesResponse(BaseModel):
+	dates: list[str]
+	latest_date: str
+
+
 class ModelProgressItem(BaseModel):
 	model_name: str
 	target_monthly: int

@@ -7,11 +7,23 @@ from allur_factory.api.dependencies import (
 	GET_FACTORY_LAYOUT_SERVICE_DEPENDENCY,
 	GET_FACTORY_SERVICE_DEPENDENCY,
 )
-from allur_factory.schemas.factory import FactoryLayoutResponse, PipelineResponse
+from allur_factory.schemas.factory import (
+	AvailableDatesResponse,
+	FactoryLayoutResponse,
+	PipelineResponse,
+)
 from allur_factory.services.factory_layout_service import FactoryLayoutService
 from allur_factory.services.factory_service import FactoryService
 
 router = APIRouter(prefix='/factory', tags=['Digital Factory'])
+
+
+@router.get('/dates', status_code=status.HTTP_200_OK, response_model=AvailableDatesResponse)
+async def get_available_dates(
+	factory_service: FactoryService = GET_FACTORY_SERVICE_DEPENDENCY,
+) -> AvailableDatesResponse:
+	"""Fetch list of all dates with production data and the latest available date."""
+	return await factory_service.get_available_dates()
 
 
 @router.get('/pipeline', status_code=status.HTTP_200_OK, response_model=PipelineResponse)

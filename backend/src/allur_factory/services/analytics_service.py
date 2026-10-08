@@ -165,6 +165,44 @@ class AnalyticsService:
 			risk_status=risk_status,
 		)
 
+		# Month-to-date historical context for holistic AI analysis
+		month_start = resolved_date.replace(day=1)
+		mtd_metrics = await self.repository.get_shift_metrics_range(month_start, resolved_date)
+		mtd_downtimes = await self.repository.get_downtimes_range(month_start, resolved_date)
+
+		recorded_dates = {m.record_date for m in mtd_metrics}
+		days_count = len(recorded_dates) or 1
+		mtd_fact = sum(m.fact for m in mtd_metrics)
+		mtd_plan = sum(m.plan if m.plan is not None else 0 for m in mtd_metrics)
+		mtd_dt = sum(d.duration_minutes for d in mtd_downtimes)
+		mtd_defects = sum(m.defects_count if m.defects_count is not None else 0 for m in mtd_metrics)
+
+		mtd_oee = (
+			calculate_oee(mtd_dt, mtd_fact, mtd_plan, mtd_defects)['oee']
+			if mtd_plan > 0
+			else predicted_shift_oee
+		)
+
+		eq_counts: dict[str, int] = {}
+		eq_durations: dict[str, int] = {}
+		for d in mtd_downtimes:
+			eq_counts[d.equipment] = eq_counts.get(d.equipment, 0) + 1
+			eq_durations[d.equipment] = eq_durations.get(d.equipment, 0) + d.duration_minutes
+
+		chronic_bottlenecks = [
+			f'{eq} ({count} инцидента, суммарно {eq_durations[eq]} мин)'
+			for eq, count in eq_counts.items()
+			if count >= 2
+		]
+
+		monthly_context = {
+			'days_count': days_count,
+			'mtd_oee': mtd_oee,
+			'mtd_fact': mtd_fact,
+			'mtd_plan': mtd_plan,
+			'chronic_bottlenecks': chronic_bottlenecks,
+		}
+
 		# AI recommendations via OpenRouter (Nemotron)
 		ai_recommendations = await generate_ai_recommendations(
 			forecast_date=resolved_date.isoformat(),
@@ -174,6 +212,7 @@ class AnalyticsService:
 			model_name=target_model,
 			projected_fact=projected_fact,
 			month_target=month_target,
+			monthly_context=monthly_context,
 		)
 
 		return PredictiveForecastResponse(

@@ -35,11 +35,17 @@ export const ForecastHeader = ({
             onChange={onSelectDate}
             leftIcon={<IconCalendar size={15} stroke={1.75} />}
             options={[
-              { value: '2026-10-02', label: '01 Окт — 31 Окт 2026' },
-              { value: '2026-10-01', label: '01 Сен — 30 Сен 2026' },
+              { value: '2026-10-08', label: '01 Окт — 08 Окт 2026 (Тек. срез)' },
+              { value: '2026-10-07', label: '01 Окт — 07 Окт 2026' },
+              { value: '2026-10-06', label: '01 Окт — 06 Окт 2026' },
+              { value: '2026-10-05', label: '01 Окт — 05 Окт 2026' },
+              { value: '2026-10-04', label: '01 Окт — 04 Окт 2026' },
+              { value: '2026-10-03', label: '01 Окт — 03 Окт 2026' },
+              { value: '2026-10-02', label: '01 Окт — 02 Окт 2026' },
+              { value: '2026-10-01', label: '01 Окт 2026 (Старт)' },
             ]}
             aria-label="Период прогноза"
-            className="w-56"
+            className="w-64"
           />
 
           {/* Horizon Dropdown */}

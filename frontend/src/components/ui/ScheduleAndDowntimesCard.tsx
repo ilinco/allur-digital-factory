@@ -14,11 +14,15 @@ interface ScheduleAndDowntimesCardProps {
   downtimes: DowntimeIncident[];
 }
 
-const DATES = [
-  { label: '30 Сен', value: '2026-09-30' },
-  { label: '1 Окт', value: '2026-10-01' },
-  { label: '2 Окт', value: '2026-10-02' },
-  { label: '3 Окт', value: '2026-10-03' },
+const ALL_OCTOBER_DATES = [
+  { label: '01 Окт', value: '2026-10-01' },
+  { label: '02 Окт', value: '2026-10-02' },
+  { label: '03 Окт', value: '2026-10-03' },
+  { label: '04 Окт', value: '2026-10-04' },
+  { label: '05 Окт', value: '2026-10-05' },
+  { label: '06 Окт', value: '2026-10-06' },
+  { label: '07 Окт', value: '2026-10-07' },
+  { label: '08 Окт', value: '2026-10-08' },
 ];
 
 export const ScheduleAndDowntimesCard = ({
@@ -29,18 +33,24 @@ export const ScheduleAndDowntimesCard = ({
 }: ScheduleAndDowntimesCardProps) => {
   const [activeTab, setActiveTab] = useState<'stations' | 'downtimes'>('stations');
 
-  const currentIndex = DATES.findIndex((d) => d.value === selectedDate);
-  const safeIndex = currentIndex !== -1 ? currentIndex : 2;
+  const currentIndex = ALL_OCTOBER_DATES.findIndex((d) => d.value === selectedDate);
+  const safeIndex = currentIndex !== -1 ? currentIndex : ALL_OCTOBER_DATES.length - 1;
+
+  const windowStart = Math.max(
+    0,
+    Math.min(safeIndex - 2, ALL_OCTOBER_DATES.length - 4),
+  );
+  const visibleDates = ALL_OCTOBER_DATES.slice(windowStart, windowStart + 4);
 
   const handlePrevDate = () => {
     if (safeIndex > 0) {
-      onSelectDate(DATES[safeIndex - 1].value);
+      onSelectDate(ALL_OCTOBER_DATES[safeIndex - 1].value);
     }
   };
 
   const handleNextDate = () => {
-    if (safeIndex < DATES.length - 1) {
-      onSelectDate(DATES[safeIndex + 1].value);
+    if (safeIndex < ALL_OCTOBER_DATES.length - 1) {
+      onSelectDate(ALL_OCTOBER_DATES[safeIndex + 1].value);
     }
   };
 
@@ -70,13 +80,13 @@ export const ScheduleAndDowntimesCard = ({
         <div>
           {/* Date Selector Strip with active Prev/Next handlers */}
           <DateStripSelector
-            dates={DATES}
+            dates={visibleDates}
             selectedDate={selectedDate}
             onSelectDate={onSelectDate}
             onPrev={handlePrevDate}
             onNext={handleNextDate}
             disabledPrev={safeIndex <= 0}
-            disabledNext={safeIndex >= DATES.length - 1}
+            disabledNext={safeIndex >= ALL_OCTOBER_DATES.length - 1}
           />
 
           {/* Tab switchers */}

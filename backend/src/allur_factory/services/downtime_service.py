@@ -122,3 +122,24 @@ class DowntimeService:
 				is_alert=new_oee_res['is_alert'],
 			),
 		)
+
+	async def get_downtimes(self, target_date: date | None = None) -> list[DowntimeRecordResponse]:
+		"""Retrieve list of downtimes for given date, defaulting to latest date."""
+		resolved_date = target_date or await self.repository.get_latest_record_date() or date(2026, 10, 8)
+		records = await self.repository.get_downtimes_by_date(resolved_date)
+		lines = await self.repository.get_lines()
+		line_map = {line.id: line.name for line in lines}
+
+		return [
+			DowntimeRecordResponse(
+				id=d.id,
+				record_date=d.record_date.isoformat(),
+				section_id=d.line_id or 'unknown',
+				section_name=line_map.get(d.line_id or '', d.section),
+				equipment=d.equipment,
+				equipment_id=d.equipment_id,
+				reason=d.reason,
+				duration_minutes=d.duration_minutes,
+			)
+			for d in records
+		]

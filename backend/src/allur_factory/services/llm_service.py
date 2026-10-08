@@ -23,6 +23,7 @@ async def generate_ai_recommendations(
 	model_name: str,
 	projected_fact: int,
 	month_target: int,
+	monthly_context: dict[str, Any] | None = None,
 ) -> list[str]:
 	"""Generate actionable engineering recommendations via OpenRouter LLM (Nvidia Nemotron).
 
@@ -31,12 +32,14 @@ async def generate_ai_recommendations(
 	api_key = settings.OPENROUTER_API_KEY
 	if not api_key:
 		logger.info('OpenRouter API key not configured, returning standard domain recommendations.')
-		return _build_fallback_recommendations(bottlenecks, predicted_shift_oee, target_oee)
+		return _build_fallback_recommendations(
+			bottlenecks, predicted_shift_oee, target_oee, monthly_context
+		)
 
 	system_prompt = (
 		'Ты ведущий ИИ-эксперт цифрового двойника автозавода Allur. '
 		'Твоя задача — предложить ровно 2 практические, технически конкретные рекомендации '
-		'для начальника смены и главного инженера по устранению выявленных узких мест. '
+		'для начальника смены и главного инженера по устранению выявленных узких мест с учетом месячной динамики. '
 		'Отвечай ИСКЛЮЧИТЕЛЬНО в формате JSON: {"ai_recommendations": ["рекомендация 1", "рекомендация 2"]}. '
 		'Каждая рекомендация должна быть одним четким предложением на русском языке без вводных фраз.'
 	)
@@ -49,10 +52,27 @@ async def generate_ai_recommendations(
 		or 'Критических узких мест не обнаружено'
 	)
 
+	month_str = ''
+	if monthly_context:
+		days = monthly_context.get('days_count', 1)
+		m_oee = monthly_context.get('mtd_oee', predicted_shift_oee)
+		m_fact = monthly_context.get('mtd_fact', 0)
+		m_plan = monthly_context.get('mtd_plan', 0)
+		chronic = monthly_context.get('chronic_bottlenecks', [])
+		chronic_text = '; '.join(chronic) if chronic else 'Отсутствуют'
+		day_part = forecast_date.split('-')[-1] if '-' in forecast_date else forecast_date
+		month_str = (
+			f'Контекст за октябрь (с 1 по {day_part} число, {days} смен):\n'
+			f'- Средний накопленный OEE: {m_oee:.1f}%\n'
+			f'- Накопленный выпуск: {m_fact} из {m_plan} ед.\n'
+			f'- Повторяющиеся отказы за декаду: {chronic_text}\n'
+		)
+
 	user_prompt = (
 		f'Дата анализа: {forecast_date}.\n'
+		f'{month_str}'
 		f'Прогнозируемый OEE смены: {predicted_shift_oee}% (целевой: {target_oee}%).\n'
-		f'Узкие места и риски: {bottlenecks_summary}.\n'
+		f'Узкие места и риски смены: {bottlenecks_summary}.\n'
 		f'Целевая модель: {model_name} (месячный план: {month_target}, прогноз факта: {projected_fact}).\n'
 		'Сгенерируй ровно 2 инженерные рекомендации.'
 	)
@@ -93,20 +113,37 @@ async def generate_ai_recommendations(
 		KeyError,
 		TypeError,
 		ValueError,
-		Exception,
-	) as err:  # noqa: BLE001
+		Exception,  # noqa: BLE001
+	) as err:
 		logger.warning('Failed to generate recommendations via OpenRouter: %s', err)
 
-	return _build_fallback_recommendations(bottlenecks, predicted_shift_oee, target_oee)
+	return _build_fallback_recommendations(
+		bottlenecks, predicted_shift_oee, target_oee, monthly_context
+	)
 
 
 def _build_fallback_recommendations(
 	bottlenecks: list[dict[str, Any]],
 	predicted_shift_oee: float,
 	target_oee: float,
+	monthly_context: dict[str, Any] | None = None,
 ) -> list[str]:
-	"""Deterministic domain recommendations based on plant bottleneck analysis."""
+	"""Deterministic domain recommendations based on plant bottleneck analysis and monthly trends."""
 	recs: list[str] = []
+
+	if monthly_context:
+		chronic = monthly_context.get('chronic_bottlenecks', [])
+		if chronic:
+			first_chronic = chronic[0].split('(')[0].strip()
+			recs.append(
+				f'Провести углубленную ревизию узла {first_chronic} в межсменный интервал ввиду повторяющихся сбоев в октябре.'
+			)
+		mtd_oee = monthly_context.get('mtd_oee', 100.0)
+		if mtd_oee < target_oee and predicted_shift_oee < target_oee:
+			recs.append(
+				'Инициировать межцеховой штаб по стабилизации такта выпуска: накопленный OEE месяца ниже целевых 85%.'
+			)
+
 	for b in bottlenecks:
 		eq = b.get('equipment', 'оборудования')
 		sec = b.get('section_id', '')

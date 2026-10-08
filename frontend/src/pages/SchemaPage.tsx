@@ -15,7 +15,7 @@ import { useFactoryLayoutData } from '@/hooks/useFactoryLayoutData';
 import { useLockedBody } from '@/hooks/useLockedBody';
 
 export const SchemaPage = () => {
-  const [selectedDate, setSelectedDate] = useState<string>('2026-10-02');
+  const [selectedDate, setSelectedDate] = useState<string>('2026-10-08');
   const [isDowntimeModalOpen, setIsDowntimeModalOpen] = useState(false);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [isGuideOpen, setIsGuideOpen] = useState(false);

@@ -52,6 +52,34 @@ class TestDowntimesEndpoint(unittest.IsolatedAsyncioTestCase):
 		await app(scope, receive, send)
 		return status_code, json.loads(b''.join(response_body).decode())
 
+	async def asgi_get(self, path: str):
+		raw_path, _, query = path.partition('?')
+		scope = {
+			'type': 'http',
+			'http_version': '1.1',
+			'method': 'GET',
+			'scheme': 'http',
+			'path': raw_path,
+			'raw_path': raw_path.encode(),
+			'query_string': query.encode(),
+			'headers': [[b'host', b'localhost']],
+		}
+		status_code = None
+		response_body = []
+
+		async def receive():
+			return {'type': 'http.request', 'body': b'', 'more_body': False}
+
+		async def send(message):
+			nonlocal status_code
+			if message['type'] == 'http.response.start':
+				status_code = message['status']
+			elif message['type'] == 'http.response.body':
+				response_body.append(message.get('body', b''))
+
+		await app(scope, receive, send)
+		return status_code, json.loads(b''.join(response_body).decode())
+
 	# --- 201 Created: Success Scenarios ---
 
 	async def test_create_downtime_exceeding_60_min_sets_critical_status(self):
@@ -179,6 +207,33 @@ class TestDowntimesEndpoint(unittest.IsolatedAsyncioTestCase):
 			headers=[[b'authorization', b'Bearer token-test']],
 		)
 		self.assertEqual(status, 201)
+
+	# --- GET /api/v1/downtimes Tests ---
+
+	async def test_get_downtimes_success(self):
+		status, data = await self.asgi_get(f'{DOWNTIMES_URL}?date=2026-10-02')
+		self.assertEqual(status, 200)
+		self.assertIsInstance(data, list)
+		self.assertTrue(len(data) >= 1)
+		first = data[0]
+		self.assertIn('id', first)
+		self.assertIn('equipment', first)
+		self.assertIn('reason', first)
+		self.assertIn('duration_minutes', first)
+
+	async def test_get_downtimes_default_date(self):
+		status, data = await self.asgi_get(DOWNTIMES_URL)
+		self.assertEqual(status, 200)
+		self.assertIsInstance(data, list)
+
+	async def test_get_downtimes_invalid_date(self):
+		status, _ = await self.asgi_get(f'{DOWNTIMES_URL}?date=invalid-date')
+		self.assertEqual(status, 422)
+
+	async def test_get_downtimes_nonexistent_date_returns_empty(self):
+		status, data = await self.asgi_get(f'{DOWNTIMES_URL}?date=2025-01-01')
+		self.assertEqual(status, 200)
+		self.assertEqual(data, [])
 
 
 if __name__ == '__main__':

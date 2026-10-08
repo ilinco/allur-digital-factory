@@ -1,10 +1,36 @@
-from fastapi import APIRouter, status
+from datetime import date
+from typing import Annotated
+
+from fastapi import APIRouter, Query, status
 
 from allur_factory.api.dependencies import GET_DOWNTIME_SERVICE_DEPENDENCY
-from allur_factory.schemas.downtime import DowntimeCreateRequest, DowntimeCreateResponse
+from allur_factory.schemas.downtime import (
+	DowntimeCreateRequest,
+	DowntimeCreateResponse,
+	DowntimeRecordResponse,
+)
 from allur_factory.services.downtime_service import DowntimeService
 
 router = APIRouter(tags=['Downtimes'])
+
+
+@router.get(
+	'/downtimes',
+	status_code=status.HTTP_200_OK,
+	response_model=list[DowntimeRecordResponse],
+)
+async def get_downtimes(
+	date: Annotated[
+		date | None,
+		Query(
+			description='Дата инцидентов (YYYY-MM-DD). По умолчанию последняя дата',
+			examples=['2026-10-08'],
+		),
+	] = None,
+	downtime_service: DowntimeService = GET_DOWNTIME_SERVICE_DEPENDENCY,
+) -> list[DowntimeRecordResponse]:
+	"""Получение списка простоев за указанную дату."""
+	return await downtime_service.get_downtimes(target_date=date)
 
 
 @router.post(

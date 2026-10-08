@@ -15,7 +15,7 @@ import type {
 } from '@/types/schema';
 import { toast } from '@/context/notificationStore';
 
-export const useFactoryLayoutData = (selectedDate: string = '2026-10-02') => {
+export const useFactoryLayoutData = (selectedDate: string = '2026-10-08') => {
   const queryClient = useQueryClient();
   const [selectedSectionId, setSelectedSectionId] = useState<string>('welding-1');
   const [simulationResponse, setSimulationResponse] =

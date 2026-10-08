@@ -1,48 +1,31 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { fetchKpiData, fetchPipelineData } from "../api/dashboardApi";
+import {
+  fetchAvailableDates,
+  fetchDowntimes,
+  fetchKpiData,
+  fetchPipelineData,
+} from "../api/dashboardApi";
 import type { DowntimeIncident, HourlyPacePoint } from "@/types/dashboard";
 
-const DOWNTIME_RECORDS: Record<string, DowntimeIncident[]> = {
-  "2026-10-02": [
-    {
-      id: "dt-1",
-      section: "Сборка-1",
-      equipment: "Конвейер-03",
-      reason: "Обрыв цепи привода",
-      durationMinutes: 55,
-      status: "critical",
-    },
-    {
-      id: "dt-2",
-      section: "Сварка-1",
-      equipment: "Робот ABB-04",
-      reason: "Плановое ТО сервопривода",
-      durationMinutes: 30,
-      status: "warning",
-    },
-  ],
-  "2026-10-01": [
-    {
-      id: "dt-3",
-      section: "Окраска-1",
-      equipment: "Камера-02",
-      reason: "Замена фильтрующих элементов",
-      durationMinutes: 40,
-      status: "warning",
-    },
-    {
-      id: "dt-4",
-      section: "Сварка-1",
-      equipment: "Робот ABB-01",
-      reason: "Калибровка оптического датчика",
-      durationMinutes: 25,
-      status: "normal",
-    },
-  ],
-};
+const FALLBACK_OCTOBER_DATES = [
+  "2026-10-01",
+  "2026-10-02",
+  "2026-10-03",
+  "2026-10-04",
+  "2026-10-05",
+  "2026-10-06",
+  "2026-10-07",
+  "2026-10-08",
+];
 
-export const useDashboardData = (selectedDate: string = "2026-10-02") => {
+export const useDashboardData = (selectedDate: string = "2026-10-08") => {
+  const datesQuery = useQuery({
+    queryKey: ["factory-dates"],
+    queryFn: fetchAvailableDates,
+    staleTime: 60_000,
+  });
+
   const pipelineQuery = useQuery({
     queryKey: ["pipeline", selectedDate],
     queryFn: () => fetchPipelineData(selectedDate),
@@ -53,7 +36,14 @@ export const useDashboardData = (selectedDate: string = "2026-10-02") => {
     queryFn: () => fetchKpiData(selectedDate),
   });
 
-  const previousDate = selectedDate === "2026-10-02" ? "2026-10-01" : undefined;
+  const downtimesQuery = useQuery({
+    queryKey: ["downtimes", selectedDate],
+    queryFn: () => fetchDowntimes(selectedDate),
+  });
+
+  const availableDates = datesQuery.data?.dates ?? FALLBACK_OCTOBER_DATES;
+  const currentIndex = availableDates.indexOf(selectedDate);
+  const previousDate = currentIndex > 0 ? availableDates[currentIndex - 1] : undefined;
 
   const prevKpiQuery = useQuery({
     queryKey: ["kpi", previousDate],
@@ -83,7 +73,7 @@ export const useDashboardData = (selectedDate: string = "2026-10-02") => {
   }, [stations, totalDefects]);
 
   const hourlyPace = useMemo<HourlyPacePoint[]>(() => {
-    const totalFact = kpi?.total_fact ?? 346;
+    const totalFact = kpi?.total_fact ?? 345;
     const totalPlan = kpi?.total_plan ?? 360;
 
     const intervals = [
@@ -111,22 +101,41 @@ export const useDashboardData = (selectedDate: string = "2026-10-02") => {
   }, [kpi]);
 
   const downtimes = useMemo<DowntimeIncident[]>(() => {
-    return (
-      DOWNTIME_RECORDS[selectedDate] ?? [
-        {
-          id: "dt-fallback",
-          section: "Все участки",
-          equipment: "Конвейерная линия",
-          reason: "Штатный технологический перерыв",
-          durationMinutes: kpi?.total_downtime_min ?? 0,
-          status: "normal",
-        },
-      ]
-    );
-  }, [selectedDate, kpi?.total_downtime_min]);
+    if (downtimesQuery.data && downtimesQuery.data.length > 0) {
+      return downtimesQuery.data.map((d) => ({
+        id: `dt-${d.id}`,
+        section: d.section_name || d.section_id,
+        equipment: d.equipment,
+        reason: d.reason,
+        durationMinutes: d.duration_minutes,
+        status:
+          d.duration_minutes > 60
+            ? "critical"
+            : d.duration_minutes >= 30
+              ? "warning"
+              : "normal",
+      }));
+    }
+
+    return [
+      {
+        id: "dt-fallback",
+        section: "Все участки",
+        equipment: "Конвейерная линия",
+        reason: "Штатный технологический перерыв",
+        durationMinutes: kpi?.total_downtime_min ?? 0,
+        status: "normal",
+      },
+    ];
+  }, [downtimesQuery.data, kpi?.total_downtime_min]);
 
   const refetchAll = async () => {
-    await Promise.all([pipelineQuery.refetch(), kpiQuery.refetch()]);
+    await Promise.all([
+      pipelineQuery.refetch(),
+      kpiQuery.refetch(),
+      downtimesQuery.refetch(),
+      datesQuery.refetch(),
+    ]);
   };
 
   return {
@@ -138,8 +147,12 @@ export const useDashboardData = (selectedDate: string = "2026-10-02") => {
     avgDefectPercent,
     hourlyPace,
     downtimes,
+    availableDates,
     isLoading: pipelineQuery.isLoading || kpiQuery.isLoading,
-    isFetching: pipelineQuery.isFetching || kpiQuery.isFetching,
+    isFetching:
+      pipelineQuery.isFetching ||
+      kpiQuery.isFetching ||
+      downtimesQuery.isFetching,
     isError: pipelineQuery.isError || kpiQuery.isError,
     refetchAll,
   };

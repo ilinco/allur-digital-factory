@@ -219,6 +219,23 @@ class FakeProductionRepository:
 	async def get_latest_record_date(self) -> date | None:
 		return self.latest
 
+	async def get_available_dates(self) -> Sequence[date]:
+		return sorted(self.metrics_by_date.keys())
+
+	async def get_shift_metrics_range(
+		self, start_date: date, end_date: date
+	) -> Sequence[ShiftMetric]:
+		res: list[ShiftMetric] = []
+		for d in sorted(self.metrics_by_date.keys()):
+			if start_date <= d <= end_date:
+				res.extend(self.metrics_by_date[d])
+		return res
+
+	async def get_downtimes_range(
+		self, start_date: date, end_date: date
+	) -> Sequence[Downtime]:
+		return [d for d in self.downtimes if start_date <= d.record_date <= end_date]
+
 	async def commit(self) -> None:
 		pass
 

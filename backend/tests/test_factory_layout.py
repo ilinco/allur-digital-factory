@@ -121,6 +121,9 @@ class FakeProductionRepository:
 	async def get_lines_with_equipment(self) -> list[ProductionLine]:
 		return _build_lines()
 
+	async def get_available_dates(self) -> list[date]:
+		return sorted(METRICS.keys())
+
 
 class TestFactoryLayoutEndpoint(unittest.IsolatedAsyncioTestCase):
 	"""HTTP-level tests for GET /api/v1/factory/layout."""
@@ -243,6 +246,17 @@ class TestFactoryLayoutEndpoint(unittest.IsolatedAsyncioTestCase):
 		status, data = await self.asgi_get(LAYOUT_URL)
 		self.assertEqual(status, 404)
 		self.assertEqual(data['detail'], 'No production data available')
+
+	# --- GET /api/v1/factory/dates ---
+
+	async def test_available_dates_returns_list(self):
+		self.use_repo(FakeProductionRepository())
+		status, data = await self.asgi_get('/api/v1/factory/dates')
+		self.assertEqual(status, 200)
+		self.assertIn('dates', data)
+		self.assertIn('latest_date', data)
+		self.assertIsInstance(data['dates'], list)
+		self.assertTrue(len(data['dates']) >= 1)
 
 
 if __name__ == '__main__':

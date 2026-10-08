@@ -1,7 +1,12 @@
 from datetime import date
 
 from allur_factory.repositories.production import ProductionRepository
-from allur_factory.schemas.factory import PipelineResponse, StationSlaStatus, StationStatus
+from allur_factory.schemas.factory import (
+	AvailableDatesResponse,
+	PipelineResponse,
+	StationSlaStatus,
+	StationStatus,
+)
 
 LINE_NAME_TO_ID: dict[str, str] = {
 	'сварка': 'welding-1',
@@ -88,3 +93,10 @@ class FactoryService:
 			record_date=resolved_date.isoformat(),
 			stations=stations,
 		)
+
+	async def get_available_dates(self) -> AvailableDatesResponse:
+		"""Get list of all available production dates and the latest date."""
+		dates = await self.repository.get_available_dates()
+		iso_dates = [d.isoformat() for d in dates]
+		latest = iso_dates[-1] if iso_dates else '2026-10-08'
+		return AvailableDatesResponse(dates=iso_dates, latest_date=latest)

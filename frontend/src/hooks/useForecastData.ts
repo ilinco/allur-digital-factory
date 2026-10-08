@@ -42,7 +42,7 @@ const FALLBACK_FORECAST: PredictiveForecastResponse = {
   ],
 };
 
-export const useForecastData = (initialDate: string = '2026-10-02') => {
+export const useForecastData = (initialDate: string = '2026-10-08') => {
   const [selectedDate, setSelectedDate] = useState<string>(initialDate);
   const [targetModel, setTargetModel] = useState<string>('Chevrolet Onix');
   const [simulateDowntimeMin, setSimulateDowntimeMin] = useState<number>(0);
