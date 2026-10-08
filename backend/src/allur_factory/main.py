@@ -6,7 +6,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import SQLAlchemyError
 
-from allur_factory.api.routers.health import router as health_router
+from allur_factory.api.routers import (
+	analytics_router,
+	api_v1_router,
+	factory_router,
+	health_router,
+)
 from allur_factory.core.config import settings
 from allur_factory.core.database import (
 	DATABASE_URL,
@@ -46,6 +51,9 @@ app.add_middleware(
 setup_exception_handlers(app)
 
 app.include_router(health_router)
+app.include_router(api_v1_router)
+app.include_router(factory_router, include_in_schema=False)
+app.include_router(analytics_router, include_in_schema=False)
 
 
 def main():
