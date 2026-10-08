@@ -189,5 +189,25 @@ class TestPredictiveForecastEndpoint(unittest.IsolatedAsyncioTestCase):
 		self.assertEqual(status, 200)
 
 
+	async def test_predictive_forecast_rejects_dummy_rec1_rec2_placeholders(self):
+		class DummyResp:
+			status_code = 200
+
+			def json(self):
+				return {'choices': [{'message': {'content': '{"ai_recommendations": ["rec1", "rec2"]}'}}]}
+
+		with patch('allur_factory.services.llm_service.httpx.AsyncClient.post', return_value=DummyResp()):
+			status, data = await self.asgi_post(
+				PREDICTIVE_URL,
+				{'target_date': '2026-10-02', 'simulate_extra_downtime_min': 0, 'target_model': 'Chevrolet Onix'},
+			)
+			self.assertEqual(status, 200)
+			self.assertGreaterEqual(len(data['ai_recommendations']), 2)
+			for rec in data['ai_recommendations']:
+				self.assertNotIn('rec1', rec)
+				self.assertNotIn('rec2', rec)
+				self.assertGreaterEqual(len(rec), 15)
+
+
 if __name__ == '__main__':
 	unittest.main()

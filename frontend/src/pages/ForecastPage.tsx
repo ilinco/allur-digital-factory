@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { PageContent } from '@/components/layout/PageContent';
 import { ForecastHeader } from '@/components/ui/forecast/ForecastHeader';
 import { ForecastKpiCardsRow } from '@/components/ui/forecast/ForecastKpiCardsRow';
+import { ForecastAiAnalyzingState } from '@/components/ui/forecast/ForecastAiAnalyzingState';
+import { ForecastAiBanner } from '@/components/ui/forecast/ForecastAiBanner';
 import { ForecastOverviewChartCard } from '@/components/ui/forecast/ForecastOverviewChartCard';
 import { ForecastDailyPaceCard } from '@/components/ui/forecast/ForecastDailyPaceCard';
 import { ForecastDistributionCard } from '@/components/ui/forecast/ForecastDistributionCard';
@@ -32,8 +34,10 @@ export const ForecastPage = () => {
     distributionData,
     bottlenecks,
     totalLostUnits,
+    aiRecommendations,
     isLoading,
     isFetching,
+    isAnalyzing,
     isError,
     refetchAll,
   } = useForecastData();
@@ -46,43 +50,36 @@ export const ForecastPage = () => {
         horizon={horizon}
         onChangeHorizon={setHorizon}
         onRefresh={refetchAll}
-        isRefreshing={isFetching}
+        isRefreshing={isFetching || isAnalyzing}
         onOpenSimulation={() => setIsSimulationOpen(true)}
         onOpenGuide={() => setIsGuideOpen(true)}
       />
 
       <PageContent>
         {isLoading ? (
-          <div className="space-y-4 animate-pulse">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              <div className="h-32 rounded-2xl border border-slate-200 bg-white" />
-              <div className="h-32 rounded-2xl border border-slate-200 bg-white" />
-              <div className="h-32 rounded-2xl border border-slate-200 bg-white" />
-            </div>
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
-              <div className="h-96 rounded-2xl border border-slate-200 bg-white lg:col-span-8" />
-              <div className="h-96 rounded-2xl border border-slate-200 bg-white lg:col-span-4" />
-            </div>
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
-              <div className="h-80 rounded-2xl border border-slate-200 bg-white lg:col-span-4" />
-              <div className="h-80 rounded-2xl border border-slate-200 bg-white lg:col-span-8" />
-            </div>
-          </div>
+          <ForecastAiAnalyzingState />
         ) : isError ? (
           <ErrorCard
-            title="Не удалось загрузить прогноз с сервера завода"
-            message="Проверьте соединение с API цифрового двойника Allur и повторите попытку."
+            title="Связь с сервером прогнозов ограничена"
+            message="Используются расчетные эвристики цифрового двойника Allur. Нажмите кнопку для повторного запроса."
             onRetry={refetchAll}
           />
         ) : (
           <div className="space-y-4 sm:space-y-5">
-            {/* Top KPI Cards Row (3 cards matching screenshot) */}
+            {/* AI Digital Twin Banner with live analysis tracker */}
+            <ForecastAiBanner
+              onOpenSimulation={() => setIsSimulationOpen(true)}
+              bottlenecksCount={bottlenecks.length}
+              isAnalyzing={isAnalyzing}
+            />
+
+            {/* Top KPI Cards Row */}
             <ForecastKpiCardsRow
               forecast={forecast}
               totalLostUnits={totalLostUnits}
             />
 
-            {/* Middle Row: Overview Stacked Bar Chart (8 cols) + Daily Pace Bar Chart (4 cols) */}
+            {/* Middle Row: Overview Stacked Bar Chart (8 cols) + Daily Pace & AI Recs (4 cols) */}
             <div className="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-12">
               <div className="lg:col-span-7 xl:col-span-8">
                 <ForecastOverviewChartCard
@@ -92,7 +89,12 @@ export const ForecastPage = () => {
                 />
               </div>
               <div className="lg:col-span-5 xl:col-span-4">
-                <ForecastDailyPaceCard data={dailyPaceData} />
+                <ForecastDailyPaceCard
+                  data={dailyPaceData}
+                  aiRecommendations={aiRecommendations}
+                  onOpenSimulation={() => setIsSimulationOpen(true)}
+                  isAnalyzing={isAnalyzing}
+                />
               </div>
             </div>
 
@@ -104,6 +106,7 @@ export const ForecastPage = () => {
               <div className="lg:col-span-7 xl:col-span-8">
                 <ForecastBottlenecksTableCard
                   bottlenecks={bottlenecks}
+                  aiRecommendations={aiRecommendations}
                   onOpenSimulation={() => setIsSimulationOpen(true)}
                 />
               </div>

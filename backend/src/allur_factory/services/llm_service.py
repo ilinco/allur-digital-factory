@@ -15,6 +15,15 @@ DEFAULT_RECOMMENDATIONS = [
 ]
 
 
+def _is_valid_recommendation(text: str) -> bool:
+	cleaned = text.strip()
+	if len(cleaned) < 15:
+		return False
+	if re.match(r'^(rec|рекомендаци[яи]|recommendation)\s*\d*$', cleaned, re.IGNORECASE):
+		return False
+	return True
+
+
 async def generate_ai_recommendations(
 	forecast_date: str,
 	predicted_shift_oee: float,
@@ -38,10 +47,15 @@ async def generate_ai_recommendations(
 
 	system_prompt = (
 		'Ты ведущий ИИ-эксперт цифрового двойника автозавода Allur. '
-		'Твоя задача — предложить ровно 2 практические, технически конкретные рекомендации '
-		'для начальника смены и главного инженера по устранению выявленных узких мест с учетом месячной динамики. '
-		'Отвечай ИСКЛЮЧИТЕЛЬНО в формате JSON: {"ai_recommendations": ["рекомендация 1", "рекомендация 2"]}. '
-		'Каждая рекомендация должна быть одним четким предложением на русском языке без вводных фраз.'
+		'Твоя задача — предложить ровно 2 практические, технически конкретные инженерные рекомендации '
+		'для начальника смены и главного инженера по устранению выявленных узких мест и стабилизации сменного такта. '
+		'Отвечай ИСКЛЮЧИТЕЛЬНО в формате JSON с полными предложениями:\n'
+		'{"ai_recommendations": [\n'
+		'  "Провести диагностику натяжного механизма Конвейер-03 до начала 2-й смены для исключения останова линии.",\n'
+		'  "Сдвинуть плановое ТО манипулятора ABB-04 на межсменный перерыв 03:00-03:30 для сохранения такта."\n'
+		']}\n'
+		'Каждая рекомендация обязана быть полным инженерным действием (не менее 30 символов). '
+		'Категорически запрещено возвращать плейсхолдеры вроде rec1, rec2 или сокращенные метки.'
 	)
 
 	bottlenecks_summary = (
@@ -92,7 +106,7 @@ async def generate_ai_recommendations(
 	}
 
 	try:
-		async with httpx.AsyncClient(timeout=15.0) as client:
+		async with httpx.AsyncClient(timeout=35.0) as client:
 			resp = await client.post(
 				f'{settings.OPENROUTER_BASE_URL}/chat/completions',
 				headers=headers,
@@ -104,9 +118,25 @@ async def generate_ai_recommendations(
 				match = re.search(r'\{.*\}', content, re.DOTALL)
 				if match:
 					parsed = json.loads(match.group(0))
-					recs = parsed.get('ai_recommendations') or parsed.get('recommendations')
-					if isinstance(recs, list) and len(recs) >= 2:
-						return [str(r).strip() for r in recs[:3] if str(r).strip()]
+					recs_raw: list[Any] = []
+					if isinstance(parsed, dict):
+						val = parsed.get('ai_recommendations') or parsed.get('recommendations')
+						if isinstance(val, list):
+							recs_raw = val
+						elif isinstance(val, dict):
+							recs_raw = list(val.values())
+						elif any(k.lower().startswith('rec') for k in parsed.keys()):
+							recs_raw = list(parsed.values())
+					elif isinstance(parsed, list):
+						recs_raw = parsed
+
+					valid_recs = [
+						str(r).strip()
+						for r in recs_raw
+						if isinstance(r, (str, int, float)) and _is_valid_recommendation(str(r))
+					]
+					if len(valid_recs) >= 2:
+						return valid_recs[:3]
 	except (
 		httpx.HTTPError,
 		json.JSONDecodeError,

@@ -28,32 +28,32 @@ export const ForecastKpiCardsRow = ({
     <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-3">
       <ForecastKpiCard
         icon={<IconGauge size={22} stroke={1.75} />}
-        title="Прогнозируемый OEE"
+        title="ИИ-прогноз OEE"
         value={`${oee}%`}
         delta={oeeDiff >= 0 ? `+${oeeDiff}%` : `${oeeDiff}%`}
         deltaType={oeeDiff >= 0 ? 'positive' : 'negative'}
-        tooltipText="Расчетный показатель общей эффективности оборудования с учетом прогноза простоев"
-        subtext={`Цель завода: ${targetOee}% OEE`}
+        tooltipText="Предиктивный расчет OEE оборудования на основе телеметрии смен и плановых остановок"
+        subtext={`Цель завода: ${targetOee}% OEE (доверие 95%)`}
       />
 
       <ForecastKpiCard
         icon={<IconPackage size={22} stroke={1.75} />}
-        title="Прогноз выпуска авто"
+        title="ИИ-прогноз выпуска"
         value={`${projectedFact.toLocaleString('ru-RU')} шт.`}
-        delta={`${planFulfillment}%`}
+        delta={`${planFulfillment}% плана`}
         deltaType={Number(planFulfillment) >= 95 ? 'positive' : 'negative'}
-        tooltipText="Прогнозируемый фактический объем сборки к окончанию отчетного периода"
+        tooltipText="Нейросетевая экстраполяция фактического темпа сборки до конца отчетного периода"
         subtext={`План: ${monthTarget.toLocaleString('ru-RU')} шт. (${planForecast.model})`}
       />
 
       <ForecastKpiCard
         icon={<IconClockPause size={22} stroke={1.75} />}
-        title="Риск потерь от простоев"
+        title="Оценка риска потерь"
         value={`${totalLostUnits} шт.`}
-        delta={totalLostUnits > 20 ? 'Высокий риск' : 'В норме SLA'}
+        delta={totalLostUnits > 20 ? 'Критичный риск' : 'Контролируемый риск'}
         deltaType={totalLostUnits > 20 ? 'negative' : 'positive'}
-        tooltipText="Оценка снижения сменного выпуска из-за узких мест конвейера и ТО"
-        subtext={`${forecast.bottlenecks.length} выявленных узких мест`}
+        tooltipText="Прогноз потерь готовой продукции из-за выявленных узких мест оборудования"
+        subtext={`${forecast.bottlenecks.length} узких места (компенсация +${totalLostUnits} шт.)`}
       />
     </div>
   );

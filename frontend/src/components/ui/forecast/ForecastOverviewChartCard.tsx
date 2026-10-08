@@ -45,9 +45,13 @@ export const ForecastOverviewChartCard = ({
             <IconChartBar size={18} stroke={1.75} />
           </div>
           <h2 className="text-base font-semibold text-slate-900">
-            Обзор прогноза выпуска ({horizonSubtitle})
+            ИИ-обзор прогноза выпуска ({horizonSubtitle})
           </h2>
         </div>
+
+        <span className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold text-slate-700">
+          Предиктивный горизонт
+        </span>
       </div>
 
       {/* Main Metric Highlight */}

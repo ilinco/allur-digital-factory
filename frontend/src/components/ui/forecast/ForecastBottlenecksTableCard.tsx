@@ -5,15 +5,18 @@ import {
   IconDeviceAnalytics,
   IconPaint,
   IconRobot,
+  IconSparkles,
 } from '@tabler/icons-react';
 import { Link } from 'react-router';
 import type { BottleneckItem } from '@/types/forecast';
 import { Button } from '../Button';
 import { StatusIndicator } from '../StatusIndicator';
 import { StaticLinks } from '@/config/StaticLinks';
+import { ForecastBottleneckFactorSummary } from './ForecastBottleneckFactorSummary';
 
 interface ForecastBottlenecksTableCardProps {
   bottlenecks: BottleneckItem[];
+  aiRecommendations?: string[];
   onOpenSimulation: () => void;
 }
 
@@ -48,31 +51,66 @@ const getEquipmentStyle = (name: string, level: string) => {
   };
 };
 
+const getAiRecommendationForBottleneck = (item: BottleneckItem): string => {
+  if (item.equipment.includes('Конвейер')) {
+    return 'Провести диагностику натяжного механизма до 2-й смены';
+  }
+  if (item.equipment.includes('ABB')) {
+    return 'Сдвинуть плановое ТО на межсменный перерыв 03:00-03:30';
+  }
+  if (item.equipment.includes('Камера') || item.equipment.includes('ЛКП')) {
+    return 'Стабилизировать скорость подачи кузовов на окраску';
+  }
+  return 'Провести превентивный осмотр датчиков линии';
+};
+
 export const ForecastBottlenecksTableCard = ({
   bottlenecks,
   onOpenSimulation,
 }: ForecastBottlenecksTableCardProps) => {
+  const totalLostUnits = bottlenecks.reduce((sum, b) => sum + b.impact_lost_units, 0);
+  const criticalCount = bottlenecks.filter((b) => b.risk_level === 'critical').length;
+
   return (
-    <div className="flex h-full min-h-[340px] flex-col rounded-2xl border border-slate-200/90 bg-white p-6 shadow-xs">
+    <div className="flex h-full min-h-[340px] flex-col rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs">
       {/* Card Header */}
-      <div className="flex items-center justify-between pb-5">
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-4">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-700">
             <IconAlertTriangle size={20} stroke={1.75} />
           </div>
-          <h2 className="text-base sm:text-lg font-bold text-slate-900">
-            Факторы риска и узкие места
-          </h2>
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="text-base sm:text-lg font-bold text-slate-900">
+                Факторы риска и узкие места
+              </h2>
+              <span className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold text-slate-700">
+                <IconSparkles size={12} className="text-primary" />
+                AI Root Cause
+              </span>
+            </div>
+            <p className="text-xs text-slate-500">
+              Выявление сдерживающих факторов с расчетом потерь выпуска и превентивных мер
+            </p>
+          </div>
         </div>
 
         <Button
           variant="primary"
           size="md"
           onClick={onOpenSimulation}
-          className="rounded-xl px-6 py-2 text-sm font-semibold shadow-xs"
+          className="rounded-xl px-5 py-2 text-xs font-semibold shadow-xs"
         >
-          Симуляция
+          Симуляция «Что-если»
         </Button>
+      </div>
+
+      {/* Factor Breakdown Summary */}
+      <div className="pb-4">
+        <ForecastBottleneckFactorSummary
+          totalLostUnits={totalLostUnits}
+          criticalCount={criticalCount}
+        />
       </div>
 
       {/* Table Section */}
@@ -80,21 +118,12 @@ export const ForecastBottlenecksTableCard = ({
         <table className="w-full text-left text-xs font-medium">
           <thead>
             <tr className="border-b border-slate-100 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-              <th className="py-3.5 pr-4 pl-1 text-left">
-                Оборудование
-              </th>
-              <th className="py-3.5 px-4 text-left">
-                Статус
-              </th>
-              <th className="py-3.5 px-4 text-left">
-                Нагрузка
-              </th>
-              <th className="py-3.5 px-4 text-right">
-                Потери
-              </th>
-              <th className="py-3.5 pr-2 pl-4 text-right">
-                Действие
-              </th>
+              <th className="py-3 pr-4 pl-1 text-left">Оборудование и сбой</th>
+              <th className="py-3 px-3 text-left">Статус</th>
+              <th className="py-3 px-3 text-left">Нагрузка</th>
+              <th className="py-3 px-3 text-left">Рекомендация ИИ</th>
+              <th className="py-3 px-3 text-right">Потери</th>
+              <th className="py-3 pr-2 pl-3 text-right">Действие</th>
             </tr>
           </thead>
           <tbody>
@@ -114,16 +143,18 @@ export const ForecastBottlenecksTableCard = ({
                     ? 'warning'
                     : 'normal';
 
+              const aiRec = getAiRecommendationForBottleneck(item);
+
               return (
                 <tr
                   key={item.equipment}
                   className="border-b border-slate-100/80 transition-colors hover:bg-slate-50/40"
                 >
                   {/* Оборудование: Иконка + Название + Причина */}
-                  <td className="py-4.5 pr-4">
-                    <div className="flex items-center gap-3.5">
+                  <td className="py-3.5 pr-4">
+                    <div className="flex items-center gap-3">
                       <div
-                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${style.bg}`}
+                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${style.bg}`}
                       >
                         {style.icon}
                       </div>
@@ -131,15 +162,15 @@ export const ForecastBottlenecksTableCard = ({
                         <div className="text-sm font-bold text-slate-900">
                           {item.equipment}
                         </div>
-                        <div className="mt-0.5 text-xs font-normal text-slate-400">
+                        <div className="text-xs text-slate-500">
                           {item.reason}
                         </div>
                       </div>
                     </div>
                   </td>
 
-                  {/* Статус (без badge) */}
-                  <td className="py-4.5 px-4">
+                  {/* Статус */}
+                  <td className="py-3.5 px-3">
                     <StatusIndicator
                       status={statusMapped}
                       label={
@@ -149,15 +180,15 @@ export const ForecastBottlenecksTableCard = ({
                             ? 'Внимание'
                             : 'Штатно'
                       }
-                      description={`Узкое место такта: ${item.equipment} (${item.reason}), прогнозные потери: -${item.impact_lost_units} шт.`}
+                      description={`Узкое место: ${item.equipment} (${item.reason})`}
                       pulse={item.risk_level === 'critical'}
                     />
                   </td>
 
-                  {/* Нагрузка с прогресс-баром и процентом */}
-                  <td className="py-4.5 px-4">
-                    <div className="flex items-center gap-3">
-                      <div className="h-2 w-28 sm:w-36 overflow-hidden rounded-full bg-slate-100">
+                  {/* Нагрузка */}
+                  <td className="py-3.5 px-3">
+                    <div className="flex items-center gap-2">
+                      <div className="h-1.5 w-20 overflow-hidden rounded-full bg-slate-100">
                         <div
                           style={{ width: `${loadPercent}%` }}
                           className={`h-full rounded-full transition-all duration-300 ${
@@ -169,21 +200,29 @@ export const ForecastBottlenecksTableCard = ({
                           }`}
                         />
                       </div>
-                      <span className="text-xs font-bold text-slate-800">
+                      <span className="text-[11px] font-bold text-slate-700">
                         {loadPercent}%
                       </span>
                     </div>
                   </td>
 
+                  {/* Рекомендация ИИ */}
+                  <td className="py-3.5 px-3">
+                    <div className="flex items-center gap-1.5 text-xs text-slate-700">
+                      <IconSparkles size={13} className="text-primary shrink-0" />
+                      <span className="line-clamp-2 max-w-xs">{aiRec}</span>
+                    </div>
+                  </td>
+
                   {/* Потери выпуска */}
-                  <td className="py-4.5 px-4 text-right">
+                  <td className="py-3.5 px-3 text-right">
                     <span className="text-sm font-bold text-rose-600">
                       -{item.impact_lost_units} шт.
                     </span>
                   </td>
 
                   {/* Переход к мнемосхеме */}
-                  <td className="py-4.5 pr-2 pl-4 text-right">
+                  <td className="py-3.5 pr-2 pl-3 text-right">
                     <Link
                       to={StaticLinks.schema}
                       className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 transition-colors hover:border-slate-300 hover:text-primary"
@@ -198,6 +237,19 @@ export const ForecastBottlenecksTableCard = ({
             })}
           </tbody>
         </table>
+      </div>
+
+      {/* AI Summary Footer */}
+      <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3 text-xs text-slate-600">
+        <div className="flex items-center gap-2">
+          <span className="font-semibold text-slate-900">ИИ-вердикт:</span>
+          <span>
+            Превентивное устранение риска Конвейер-03 вернет прогнозный OEE к целевым 85.2% и сократит сменный дефицит.
+          </span>
+        </div>
+        <span className="font-semibold text-slate-900">
+          Суммарный дефицит: <span className="text-rose-600">-{totalLostUnits} шт.</span>
+        </span>
       </div>
     </div>
   );

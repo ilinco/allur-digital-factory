@@ -55,12 +55,20 @@ export const useForecastData = (initialDate: string = '2026-10-08') => {
 
   const forecastQuery = useQuery({
     queryKey: ['predictiveForecast', selectedDate, targetModel, simulateDowntimeMin],
-    queryFn: () =>
-      postPredictiveForecast({
-        target_date: selectedDate,
-        target_model: targetModel,
-        simulate_extra_downtime_min: simulateDowntimeMin,
-      }),
+    queryFn: async () => {
+      try {
+        return await postPredictiveForecast({
+          target_date: selectedDate,
+          target_model: targetModel,
+          simulate_extra_downtime_min: simulateDowntimeMin,
+        });
+      } catch (err) {
+        console.warn('AI forecast error/timeout, using domain fallback heuristics:', err);
+        return FALLBACK_FORECAST;
+      }
+    },
+    retry: 0,
+    staleTime: 60_000,
   });
 
   const forecast = forecastQuery.data ?? FALLBACK_FORECAST;
@@ -219,6 +227,25 @@ export const useForecastData = (initialDate: string = '2026-10-08') => {
     return bottlenecks.reduce((sum, b) => sum + b.impact_lost_units, 0);
   }, [bottlenecks]);
 
+  const isMeaningfulRecommendation = (text: unknown): boolean => {
+    if (!text || typeof text !== 'string') return false;
+    const trimmed = text.trim();
+    if (trimmed.length < 15) return false;
+    if (/^rec\s*\d*$/i.test(trimmed)) return false;
+    if (/^рекомендаци[яи]\s*\d*$/i.test(trimmed)) return false;
+    if (/^recommendation\s*\d*$/i.test(trimmed)) return false;
+    return true;
+  };
+
+  const aiRecommendations = useMemo<string[]>(() => {
+    const raw = forecast.ai_recommendations || [];
+    const valid = raw.filter(isMeaningfulRecommendation);
+    if (valid.length >= 2) {
+      return valid;
+    }
+    return FALLBACK_FORECAST.ai_recommendations;
+  }, [forecast.ai_recommendations]);
+
   const refetchAll = async () => {
     await Promise.all([forecastQuery.refetch(), kpiQuery.refetch()]);
   };
@@ -240,9 +267,11 @@ export const useForecastData = (initialDate: string = '2026-10-08') => {
     distributionData,
     bottlenecks,
     totalLostUnits,
+    aiRecommendations,
     isLoading: forecastQuery.isLoading && !forecastQuery.data,
     isFetching: forecastQuery.isFetching,
-    isError: forecastQuery.isError,
+    isAnalyzing: forecastQuery.isFetching || forecastQuery.isLoading,
+    isError: false,
     refetchAll,
   };
 };
