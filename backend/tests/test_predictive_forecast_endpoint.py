@@ -17,7 +17,35 @@ class TestPredictiveForecastEndpoint(unittest.IsolatedAsyncioTestCase):
 		self.repo = FakeProductionRepository()
 		app.dependency_overrides[get_production_repository] = lambda: self.repo
 
+		class MockResp:
+			status_code = 200
+
+			def json(self):
+				return {
+					'choices': [
+						{
+							'message': {
+								'content': json.dumps({
+									'analysis': 'Тестовый анализ OEE и узких мест сборочной линии',
+									'ai_recommendations': [
+										'Провести диагностику натяжного механизма Конвейер-03 до начала 2-й смены.',
+										'Снизить скорость подачи кузовов на окраску для стабилизации брака ниже порога 2%.',
+										'Перенести плановое ТО робота ABB-04 на межсменный перерыв 03:00-03:30.',
+									],
+								})
+							}
+						}
+					]
+				}
+
+		self.http_patcher = patch(
+			'allur_factory.services.llm_service.httpx.AsyncClient.post',
+			return_value=MockResp(),
+		)
+		self.http_patcher.start()
+
 	def tearDown(self) -> None:
+		self.http_patcher.stop()
 		app.dependency_overrides.clear()
 
 	async def asgi_post(self, path: str, body: dict | None = None, headers: list | None = None):

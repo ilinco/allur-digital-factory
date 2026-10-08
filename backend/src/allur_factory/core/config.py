@@ -20,8 +20,16 @@ class Settings(BaseSettings):
 		default=None,
 		validation_alias=AliasChoices('openrouter_api', 'OPENROUTER_API', 'OPENROUTER_API_KEY'),
 	)
-	OPENROUTER_MODEL: str = 'nvidia/nemotron-3-ultra-550b-a55b:free'
+	OPENROUTER_MODEL: str = 'deepseek/deepseek-v3.2'
+	OPENROUTER_FALLBACK_MODELS: list[str] = [
+		'google/gemini-3.1-flash-lite',
+		'qwen/qwen3.8-flash',
+	]
 	OPENROUTER_BASE_URL: str = 'https://openrouter.ai/api/v1'
+	OPENROUTER_TIMEOUT_S: float = Field(default=30.0, gt=0, le=120)
+	OPENROUTER_TEMPERATURE: float = Field(default=0.2, ge=0, le=1.5)
+	OPENROUTER_MAX_TOKENS: int = Field(default=1500, ge=256, le=8000)
+	LLM_CACHE_TTL_S: int = Field(default=600, ge=0, le=86400)
 
 	user: str = Field(
 		default='postgres',

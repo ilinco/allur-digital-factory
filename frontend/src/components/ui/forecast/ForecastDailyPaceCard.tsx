@@ -42,8 +42,8 @@ export const ForecastDailyPaceCard = ({
 
   const validRecs = aiRecommendations.filter(isMeaningfulText);
   const displayRecs =
-    validRecs.length >= 2
-      ? validRecs.slice(0, 2)
+    validRecs.length > 0
+      ? validRecs.slice(0, 3)
       : [
           'Сгладить пик вторника (3 874 шт.): перенести партию кузовов JAC на среду во избежание затора сварки.',
           'Диагностика натяжного механизма Конвейер-03 до начала 2-й смены (сохранение +14 авто).',

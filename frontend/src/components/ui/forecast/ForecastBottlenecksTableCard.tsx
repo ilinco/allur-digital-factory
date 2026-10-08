@@ -51,21 +51,27 @@ const getEquipmentStyle = (name: string, level: string) => {
   };
 };
 
-const getAiRecommendationForBottleneck = (item: BottleneckItem): string => {
-  if (item.equipment.includes('Конвейер')) {
-    return 'Провести диагностику натяжного механизма до 2-й смены';
-  }
-  if (item.equipment.includes('ABB')) {
-    return 'Сдвинуть плановое ТО на межсменный перерыв 03:00-03:30';
-  }
-  if (item.equipment.includes('Камера') || item.equipment.includes('ЛКП')) {
-    return 'Стабилизировать скорость подачи кузовов на окраску';
-  }
-  return 'Провести превентивный осмотр датчиков линии';
+const findMatchingAiRecommendation = (
+  item: BottleneckItem,
+  aiRecommendations: string[],
+): string | null => {
+  if (!aiRecommendations || aiRecommendations.length === 0) return null;
+  const eqLower = item.equipment.toLowerCase();
+  const secLower = item.section_id.toLowerCase();
+
+  // Try finding an AI recommendation that mentions this equipment or section
+  const directMatch = aiRecommendations.find((rec) => {
+    const rLower = rec.toLowerCase();
+    return rLower.includes(eqLower) || (secLower && rLower.includes(secLower));
+  });
+  if (directMatch) return directMatch;
+
+  return null;
 };
 
 export const ForecastBottlenecksTableCard = ({
   bottlenecks,
+  aiRecommendations = [],
   onOpenSimulation,
 }: ForecastBottlenecksTableCardProps) => {
   const totalLostUnits = bottlenecks.reduce(
@@ -133,7 +139,7 @@ export const ForecastBottlenecksTableCard = ({
             </tr>
           </thead>
           <tbody>
-            {bottlenecks.map((item) => {
+            {bottlenecks.map((item, idx) => {
               const style = getEquipmentStyle(item.equipment, item.risk_level);
               const loadPercent =
                 item.risk_level === 'critical'
@@ -149,7 +155,15 @@ export const ForecastBottlenecksTableCard = ({
                     ? 'warning'
                     : 'normal';
 
-              const aiRec = getAiRecommendationForBottleneck(item);
+              const matchedAiRec = findMatchingAiRecommendation(
+                item,
+                aiRecommendations,
+              );
+              // Fallback to indexed recommendation from AI list or fallback rule
+              const aiRec =
+                matchedAiRec ||
+                aiRecommendations[idx] ||
+                `Диагностика и устранение отклонений ${item.equipment}`;
 
               return (
                 <tr
@@ -253,8 +267,8 @@ export const ForecastBottlenecksTableCard = ({
         <div className="flex items-center gap-2">
           <span className="font-semibold text-slate-900">ИИ-вердикт:</span>
           <span>
-            Превентивное устранение риска Конвейер-03 вернет прогнозный OEE к
-            целевым 85.2% и сократит сменный дефицит.
+            {aiRecommendations[0] ||
+              'Превентивное устранение риска узких мест стабилизирует сменный такт и снизит дефицит.'}
           </span>
         </div>
         <span className="font-semibold text-slate-900">

@@ -17,11 +17,13 @@ const PIPELINE_STEPS = [
   },
   {
     title: 'Расчет суточного такта',
-    description: 'Оценка отклонений от норматива 1.80 мин/ед. и балансировки смен',
+    description:
+      'Оценка отклонений от норматива 1.80 мин/ед. и балансировки смен',
   },
   {
     title: 'Факторный анализ узких мест',
-    description: 'Локализация критических узлов оборудования (Конвейер-03, роботы ABB)',
+    description:
+      'Локализация критических узлов оборудования (Конвейер-03, роботы ABB)',
   },
   {
     title: 'Инференс нейросети Allur AI',
@@ -89,10 +91,6 @@ export const ForecastAiAnalyzingState = () => {
 
             <div className="space-y-1">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-semibold text-slate-800">
-                  <IconSparkles size={13} className="text-primary" />
-                  Цифровой двойник Allur AI
-                </span>
                 <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary">
                   <IconLoader2 size={13} className="animate-spin" />
                   Выполняется расчет
@@ -103,14 +101,17 @@ export const ForecastAiAnalyzingState = () => {
                 ИИ анализирует телеметрию и рассчитывает прогноз такта
               </h2>
               <p className="text-xs text-slate-500 max-w-2xl">
-                Нейросетевая модель сопоставляет фактические параметры оборудования с нормативным тактом 1.80 мин/ед., выявляет потенциальные сбои и формирует предиктивные рекомендации.
+                Нейросетевая модель сопоставляет фактические параметры
+                оборудования с нормативным тактом 1.80 мин/ед., выявляет
+                потенциальные сбои и формирует предиктивные рекомендации.
               </p>
             </div>
           </div>
 
           <div className="flex flex-col items-start sm:items-end gap-1 shrink-0">
             <span className="text-xs font-medium text-slate-500">
-              Время вычислений: <strong className="text-slate-900">{secondsElapsed} сек</strong>
+              Время вычислений:{' '}
+              <strong className="text-slate-900">{secondsElapsed} сек</strong>
             </span>
             <span className="text-[11px] text-slate-400">
               Расчет инференса занимает ~20-30 сек
@@ -158,7 +159,10 @@ export const ForecastAiAnalyzingState = () => {
                       <IconCheck size={12} stroke={2.5} />
                     </span>
                   ) : isCurrent ? (
-                    <IconLoader2 size={16} className="animate-spin text-primary" />
+                    <IconLoader2
+                      size={16}
+                      className="animate-spin text-primary"
+                    />
                   ) : (
                     <span className="h-2 w-2 rounded-full bg-slate-300" />
                   )}
@@ -184,7 +188,8 @@ export const ForecastAiAnalyzingState = () => {
               Контролируемые технологические зоны завода
             </h3>
             <p className="text-xs text-slate-500">
-              Потоковая верификация параметров с датчиков АСУТП цифровым двойником
+              Потоковая верификация параметров с датчиков АСУТП цифровым
+              двойником
             </p>
           </div>
           <span className="text-xs font-semibold text-slate-600">

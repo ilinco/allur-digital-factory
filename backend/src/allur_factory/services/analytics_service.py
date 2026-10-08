@@ -10,7 +10,7 @@ from allur_factory.schemas.analytics import (
 )
 from allur_factory.schemas.factory import KpiSummaryResponse, ModelProgressItem
 from allur_factory.services.llm_service import generate_ai_recommendations
-from allur_factory.services.oee_engine import calculate_oee
+from allur_factory.services.oee_engine import TOTAL_PLANNED_MINUTES, calculate_oee
 
 
 class AnalyticsService:
@@ -98,6 +98,7 @@ class AnalyticsService:
 		total_defects = sum(m.defects_count if m.defects_count is not None else 0 for m in metrics)
 
 		# OEE calculation
+		oee_components: dict[str, float] = {}
 		if metrics and total_plan > 0:
 			oee_result = calculate_oee(
 				downtime_minutes=total_downtime_min,
@@ -106,6 +107,11 @@ class AnalyticsService:
 				defects_count=total_defects,
 			)
 			predicted_shift_oee = oee_result['oee']
+			oee_components = {
+				'availability': oee_result['availability'],
+				'performance': oee_result['performance'],
+				'quality': oee_result['quality'],
+			}
 		else:
 			predicted_shift_oee = 0.0
 
@@ -203,7 +209,37 @@ class AnalyticsService:
 			'chronic_bottlenecks': chronic_bottlenecks,
 		}
 
-		# AI recommendations via OpenRouter (Nemotron)
+		shift_context = {
+			**oee_components,
+			'total_fact': total_fact,
+			'total_plan': total_plan,
+			'total_defects': total_defects,
+			'total_downtime_min': total_downtime_min,
+			'planned_minutes': TOTAL_PLANNED_MINUTES,
+			'simulated_extra_downtime_min': max(0, simulate_extra_downtime_min),
+			'lines': [
+				{
+					'line_id': m.line_id,
+					'plan': m.plan,
+					'fact': m.fact,
+					'load_percent': m.load_percent,
+					'defects': m.defects_count or 0,
+					'defect_percent': m.defect_percent or 0.0,
+				}
+				for m in metrics
+			],
+			'downtimes': [
+				{
+					'equipment': d.equipment,
+					'section': d.section,
+					'reason': d.reason,
+					'duration_minutes': d.duration_minutes,
+				}
+				for d in sorted(downtimes, key=lambda x: -x.duration_minutes)
+			],
+		}
+
+		# AI recommendations via OpenRouter
 		ai_recommendations = await generate_ai_recommendations(
 			forecast_date=resolved_date.isoformat(),
 			predicted_shift_oee=predicted_shift_oee,
@@ -213,6 +249,7 @@ class AnalyticsService:
 			projected_fact=projected_fact,
 			month_target=month_target,
 			monthly_context=monthly_context,
+			shift_context=shift_context,
 		)
 
 		return PredictiveForecastResponse(

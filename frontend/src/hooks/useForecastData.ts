@@ -240,7 +240,7 @@ export const useForecastData = (initialDate: string = '2026-10-08') => {
   const aiRecommendations = useMemo<string[]>(() => {
     const raw = forecast.ai_recommendations || [];
     const valid = raw.filter(isMeaningfulRecommendation);
-    if (valid.length >= 2) {
+    if (valid.length > 0) {
       return valid;
     }
     return FALLBACK_FORECAST.ai_recommendations;
